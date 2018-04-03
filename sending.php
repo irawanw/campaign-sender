@@ -97,6 +97,7 @@ if ($err) {
         try {        
             //Recipients
             $mail->setFrom($data->ema_account, 'Themorning Promoeu');
+			$mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
