@@ -1,0 +1,7 @@
+{
+    "require": {
+        "eden/mail": "^4.0",
+        "phpmailer/phpmailer": "^6.0",
+        "voku/bounce-mail-handler": "^5.5"
+    }
+}

@@ -1,0 +1,407 @@
+[
+    {
+        "name": "eden/array",
+        "version": "4.0.3",
+        "version_normalized": "4.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/Array.git",
+            "reference": "a66188d736c05a6595bfc87cd552522e3bb55db6"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/Array/zipball/a66188d736c05a6595bfc87cd552522e3bb55db6",
+            "reference": "a66188d736c05a6595bfc87cd552522e3bb55db6",
+            "shasum": ""
+        },
+        "require": {
+            "eden/core": "4.*",
+            "php": ">=5.4.1"
+        },
+        "time": "2016-07-24T01:32:26+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "Autoloading, error and exception handler",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "eden/core",
+        "version": "4.0.3",
+        "version_normalized": "4.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/Core.git",
+            "reference": "2dbd1f3e83ca0dd2d787d31f1654335fba6b6f72"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/Core/zipball/2dbd1f3e83ca0dd2d787d31f1654335fba6b6f72",
+            "reference": "2dbd1f3e83ca0dd2d787d31f1654335fba6b6f72",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.1"
+        },
+        "time": "2016-07-24T01:57:25+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Eden\\Core\\": "src/"
+            },
+            "classmap": [
+                "src/Decorator.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "Eden Core component full of secret sauce",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "eden/file",
+        "version": "4.0.1",
+        "version_normalized": "4.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/File.git",
+            "reference": "b499625ecb2269cc2ee9b1ff836ff050185314d9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/File/zipball/b499625ecb2269cc2ee9b1ff836ff050185314d9",
+            "reference": "b499625ecb2269cc2ee9b1ff836ff050185314d9",
+            "shasum": ""
+        },
+        "require": {
+            "eden/array": "4.*",
+            "eden/core": "4.*",
+            "eden/path": "4.*",
+            "eden/string": "4.*",
+            "php": ">=5.4.1"
+        },
+        "time": "2015-10-13T04:39:48+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Eden\\File\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "File methods",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "eden/mail",
+        "version": "4.0.4",
+        "version_normalized": "4.0.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/Mail.git",
+            "reference": "ae34e7ba2c3e4bb116ab2824ffc0b7843d63fb67"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/Mail/zipball/ae34e7ba2c3e4bb116ab2824ffc0b7843d63fb67",
+            "reference": "ae34e7ba2c3e4bb116ab2824ffc0b7843d63fb67",
+            "shasum": ""
+        },
+        "require": {
+            "eden/array": "4.*",
+            "eden/core": "4.*",
+            "eden/file": "4.*",
+            "eden/path": "4.*",
+            "eden/string": "4.*",
+            "php": ">=5.4.1"
+        },
+        "time": "2018-03-23T14:30:04+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Eden\\Mail\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "Eden POP3, IMAP and SMTP component",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "eden/path",
+        "version": "4.0.1",
+        "version_normalized": "4.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/Path.git",
+            "reference": "120bb64566ec6a31879c831f7a4259c2ad2bf131"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/Path/zipball/120bb64566ec6a31879c831f7a4259c2ad2bf131",
+            "reference": "120bb64566ec6a31879c831f7a4259c2ad2bf131",
+            "shasum": ""
+        },
+        "require": {
+            "eden/array": "4.*",
+            "eden/core": "4.*",
+            "eden/string": "4.*",
+            "php": ">=5.4.1"
+        },
+        "time": "2015-10-13T04:30:42+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Eden\\Path\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "Path resolver",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "eden/string",
+        "version": "4.0.3",
+        "version_normalized": "4.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Eden-PHP/String.git",
+            "reference": "2868350eea5c5cbe430f38915f941c0f3764ae33"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Eden-PHP/String/zipball/2868350eea5c5cbe430f38915f941c0f3764ae33",
+            "reference": "2868350eea5c5cbe430f38915f941c0f3764ae33",
+            "shasum": ""
+        },
+        "require": {
+            "eden/core": "4.*",
+            "php": ">=5.4.1"
+        },
+        "time": "2016-07-24T01:33:39+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Blanquera",
+                "email": "cblanquera@openovate.com"
+            }
+        ],
+        "description": "Autoloading, error and exception handler",
+        "homepage": "http://eden-php.com",
+        "keywords": [
+            "eden",
+            "library"
+        ]
+    },
+    {
+        "name": "phpmailer/phpmailer",
+        "version": "v6.0.5",
+        "version_normalized": "6.0.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PHPMailer/PHPMailer.git",
+            "reference": "cb3ea134d4d3729e7857737d5f320cce9caf4d32"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/cb3ea134d4d3729e7857737d5f320cce9caf4d32",
+            "reference": "cb3ea134d4d3729e7857737d5f320cce9caf4d32",
+            "shasum": ""
+        },
+        "require": {
+            "ext-ctype": "*",
+            "ext-filter": "*",
+            "php": ">=5.5.0"
+        },
+        "require-dev": {
+            "doctrine/annotations": "1.2.*",
+            "friendsofphp/php-cs-fixer": "^2.2",
+            "phpdocumentor/phpdocumentor": "2.*",
+            "phpunit/phpunit": "^4.8 || ^5.7",
+            "zendframework/zend-eventmanager": "3.0.*",
+            "zendframework/zend-i18n": "2.7.3",
+            "zendframework/zend-serializer": "2.7.*"
+        },
+        "suggest": {
+            "ext-mbstring": "Needed to send email in multibyte encoding charset",
+            "hayageek/oauth2-yahoo": "Needed for Yahoo XOAUTH2 authentication",
+            "league/oauth2-google": "Needed for Google XOAUTH2 authentication",
+            "psr/log": "For optional PSR-3 debug logging",
+            "stevenmaguire/oauth2-microsoft": "Needed for Microsoft XOAUTH2 authentication",
+            "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)"
+        },
+        "time": "2018-03-27T13:49:45+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "PHPMailer\\PHPMailer\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Jim Jagielski",
+                "email": "jimjag@gmail.com"
+            },
+            {
+                "name": "Marcus Bointon",
+                "email": "phpmailer@synchromedia.co.uk"
+            },
+            {
+                "name": "Andy Prevost",
+                "email": "codeworxtech@users.sourceforge.net"
+            },
+            {
+                "name": "Brent R. Matzelle"
+            }
+        ],
+        "description": "PHPMailer is a full-featured email creation and transfer class for PHP"
+    },
+    {
+        "name": "voku/bounce-mail-handler",
+        "version": "v5.5.2",
+        "version_normalized": "5.5.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/voku/PHPMailer-BMH.git",
+            "reference": "48a79e9688e2cd647b9371acd9162251cb60f8d1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/voku/PHPMailer-BMH/zipball/48a79e9688e2cd647b9371acd9162251cb60f8d1",
+            "reference": "48a79e9688e2cd647b9371acd9162251cb60f8d1",
+            "shasum": ""
+        },
+        "require": {
+            "ext-imap": "*",
+            "php": ">=5.3.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.0|~5.0"
+        },
+        "time": "2017-03-31T14:58:21+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "BounceMailHandler": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPLv2"
+        ],
+        "authors": [
+            {
+                "name": "Andy Prevost",
+                "email": "andy.prevost@worxteam.com",
+                "role": "Developer"
+            },
+            {
+                "name": "Anthon Pang",
+                "email": "apang@softwaredevelopment.ca",
+                "role": "Other Fork Maintainer"
+            },
+            {
+                "name": "Lars Moelleken",
+                "email": "lars@moelleken.org",
+                "role": "Fork Maintainer"
+            }
+        ],
+        "description": "Bounce Mail Handler",
+        "keywords": [
+            "bounce",
+            "bounce-mail",
+            "email",
+            "hard-bounce",
+            "mail",
+            "mailer",
+            "soft-bounce"
+        ]
+    }
+]
