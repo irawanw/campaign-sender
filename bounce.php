@@ -48,7 +48,8 @@ $bmh->verbose = BounceMailHandler::VERBOSE_SIMPLE; //BounceMailHandler::VERBOSE_
 //$bmh->debugBodyRule      = false; // false is default, no need to specify
 //$bmh->debugDsnRule       = false; // false is default, no need to specify
 //$bmh->purgeUnprocessed   = false; // false is default, no need to specify
-$bmh->disableDelete = true; // false is default, no need to specify
+//$bmh->disableDelete = true; // false is default, no need to specify
+
 /*
  * for local mailbox (to process .EML files)
  */
@@ -105,7 +106,8 @@ else
 			//$bmh->hardMailbox        = 'INBOX.hardtest'; // default is 'INBOX.hard' - NOTE: must start with 'INBOX.'
 			//$bmh->moveSoft           = true; // default is false
 			//$bmh->softMailbox        = 'INBOX.softtest'; // default is 'INBOX.soft' - NOTE: must start with 'INBOX.'
-			//$bmh->deleteMsgDate      = '2009-01-05'; // format must be as 'yyyy-mm-dd'
+			//$bmh->deleteMsgDate      = '2009-01-05'; // format must be as 'yyyy-mm-dd'			
+			
 			/*
 			 * rest used regardless what type of connection it is
 			 */
@@ -115,6 +117,81 @@ else
 			$time_end = microtime_float();
 			$time = $time_end - $time_start;
 			echo 'Seconds to process: ' . $time . '<br />';
+						
+			//load bounce type and bounce reason
+			//then unserialze them to get value each array
+			//final data is old data + new data
+			$original_bounce_type = unserialize($data->emc_num_bounce_type);
+			$original_bounce_reason = unserialize($data->emc_num_bounce_reason);
+			
+			if(is_array($original_bounce_type))
+			{
+				$final_bounce_type['blocked'] = $original_bounce_type['blocked'] + $bounce_type['blocked'];
+				$final_bounce_type['autoreply'] = $original_bounce_type['autoreply'] + $bounce_type['autoreply'];
+				$final_bounce_type['soft'] = $original_bounce_type['soft'] + $bounce_type['soft'];
+				$final_bounce_type['hard'] = $original_bounce_type['hard'] + $bounce_type['hard'];
+				$final_bounce_type['temporary'] = $original_bounce_type['temporary'] + $bounce_type['temporary'];
+				$final_bounce_type['generic'] = $original_bounce_type['generic'] + $bounce_type['generic'];
+				$final_bounce_type['unknown'] = $original_bounce_type['unknown'] + $bounce_type['unknown'];
+			} else {
+				$final_bounce_type = $bounce_type;
+			}
+			
+			if(is_array($original_bounce_reason))
+			{
+				$final_bounce_reason['antispam'] = $original_bounce_reason['antispam'] + $bounce_reason['antispam'];
+				$final_bounce_reason['autoreply'] = $original_bounce_reason['autoreply'] + $bounce_reason['autoreply'];
+				$final_bounce_reason['concurrent'] = $original_bounce_reason['concurrent'] + $bounce_reason['concurrent'];
+				$final_bounce_reason['content_reject'] = $original_bounce_reason['content_reject'] + $bounce_reason['content_reject'];
+				$final_bounce_reason['command_reject'] = $original_bounce_reason['command_reject'] + $bounce_reason['command_reject'];
+				$final_bounce_reason['internal_error'] = $original_bounce_reason['internal_error'] + $bounce_reason['internal_error'];
+				$final_bounce_reason['defer'] = $original_bounce_reason['defer'] + $bounce_reason['defer'];
+				$final_bounce_reason['delayed'] = $original_bounce_reason['delayed'] + $bounce_reason['delayed'];
+				$final_bounce_reason['dns_loop'] = $original_bounce_reason['dns_loop'] + $bounce_reason['dns_loop'];
+				$final_bounce_reason['dns_unknown'] = $original_bounce_reason['dns_unknown'] + $bounce_reason['dns_unknown'];
+				$final_bounce_reason['full'] = $original_bounce_reason['full'] + $bounce_reason['full'];
+				$final_bounce_reason['inactive'] = $original_bounce_reason['inactive'] + $bounce_reason['inactive'];
+				$final_bounce_reason['latin_only'] = $original_bounce_reason['latin_only'] + $bounce_reason['latin_only'];
+				$final_bounce_reason['other'] = $original_bounce_reason['other'] + $bounce_reason['other'];
+				$final_bounce_reason['oversize'] = $original_bounce_reason['oversize'] + $bounce_reason['oversize'];
+				$final_bounce_reason['outofoffice'] = $original_bounce_reason['outofoffice'] + $bounce_reason['outofoffice'];
+				$final_bounce_reason['unknown'] = $original_bounce_reason['unknown'] + $bounce_reason['unknown'];
+				$final_bounce_reason['unrecognized'] = $original_bounce_reason['unrecognized'] + $bounce_reason['unrecognized'];
+				$final_bounce_reason['user_reject'] = $original_bounce_reason['user_reject'] + $bounce_reason['user_reject'];
+				$final_bounce_reason['warning'] = $original_bounce_reason['warning'] + $bounce_reason['warning'];
+			} else {
+				$final_bounce_reason = $bounce_reason;
+			}
+			
+			
+			//updating email campaign
+			$fields = array(
+				'emc_num_bounce_type' => serialize($final_bounce_type),
+				'emc_num_bounce_reason' => serialize($final_bounce_reason),
+			);
+			$fields_string = http_build_query($fields);
+
+			$curl = curl_init();
+
+			//set number of bounce mail
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 30,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "PUT",
+			  CURLOPT_POSTFIELDS => $fields_string,
+			  CURLOPT_HTTPHEADER => array(	    
+				"content-type: application/x-www-form-urlencoded",
+				"x-api-key: ".API_KEY
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+			curl_close($curl);
 		}
 	}
 }

@@ -25,12 +25,19 @@
  */
 function callbackAction($msgnum, $bounceType, $email, $subject, $xheader, $remove, $ruleNo = false, $ruleCat = false, $totalFetched = 0, $body = '', $headerFull = '', $bodyFull = '')
 {
+  global $bounce_type;
+  global $bounce_reason;
+  
   $displayData = prepData($email, $bounceType, $remove);
   $bounceType = $displayData['bounce_type'];
   $emailName = $displayData['emailName'];
   $emailAddy = $displayData['emailAddy'];
   $remove = $displayData['remove'];
   echo $msgnum . ': ' . $ruleNo . ' | ' . $ruleCat . ' | ' . $bounceType . ' | ' . $remove . ' | ' . $email . ' | ' . $subject . "<br />\n";
+  
+  $bounce_type[$bounceType] += 1;
+  $bounce_reason[$ruleCat] += 1;
+  
   return true;
 }
 /**
