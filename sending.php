@@ -76,7 +76,8 @@ if ($err) {
     	curl_close($curl);
     	
       //send mail
-    	$mail = new PHPMailer(true);
+      $mail = new PHPMailer(true);
+	  $mail->CharSet = 'UTF-8';  
 
       $mail->SMTPDebug = 2;                                 // Enable verbose debug output
       $mail->isSMTP();                                      // Set mailer to use SMTP
@@ -96,7 +97,9 @@ if ($err) {
       foreach($emails as $email) {
         try {        
             //Recipients
-            $mail->setFrom($data->ema_account, 'Themorning Promoeu');
+			$sender_friendly_name = preg_split('/[@.]/', $data->ema_account);			
+			
+            $mail->setFrom($data->ema_account, ucwords($sender_friendly_name[0]), ' ', ucwords($sender_friendly_name[1]));
 			$mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
@@ -151,6 +154,8 @@ if ($err) {
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
+		
+		include("bounce.php");
       }    
 	  
 	  //deleting send.lock
