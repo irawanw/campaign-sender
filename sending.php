@@ -114,8 +114,8 @@ if ($err) {
             //Content
             $mail->isHTML(true);
             $mail->Subject = $data->emc_email_subject;
-            $mail->Body    = $data->emc_email_body;
-            $mail->AltBody = $data->emc_email_body;
+            $mail->Body    = nl2br($data->emc_email_body);
+            $mail->AltBody = strip_tags($data->emc_email_body);
             $mail->XMailer = 'Microsoft Office Outlook 12.0';
 
             $mail->send();
