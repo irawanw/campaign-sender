@@ -30,7 +30,7 @@ curl_setopt_array($curl, array(
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 30,
+  CURLOPT_TIMEOUT => 60,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
@@ -67,7 +67,7 @@ if ($err) {
     	  CURLOPT_RETURNTRANSFER => true,
     	  CURLOPT_ENCODING => "",
     	  CURLOPT_MAXREDIRS => 10,
-    	  CURLOPT_TIMEOUT => 30,
+    	  CURLOPT_TIMEOUT => 60,
     	  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     	  CURLOPT_CUSTOMREQUEST => "PUT",
     	  CURLOPT_POSTFIELDS => $fields_string,
@@ -114,7 +114,7 @@ if ($err) {
             //Content
             $mail->isHTML(true);
             $mail->Subject = $data->emc_email_subject;
-            $mail->Body    = nl2br($data->emc_email_body);
+            $mail->Body    = $data->emc_email_body;
             $mail->AltBody = strip_tags($data->emc_email_body);
             $mail->XMailer = 'Microsoft Office Outlook 12.0';
 
@@ -133,7 +133,7 @@ if ($err) {
 		
 		//update the progress
 		$fields = array(
-          'emc_progress' => $total_sent
+          'emc_num_email_sent' => $total_sent
         );  
         $fields_string = http_build_query($fields);
 
@@ -143,7 +143,7 @@ if ($err) {
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
           CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 30,
+          CURLOPT_TIMEOUT => 60,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "PUT",
           CURLOPT_POSTFIELDS => $fields_string,
