@@ -198,7 +198,7 @@ if ($err) {
 	  
 	  //deleting send.lock
 	  //it will release cron to call this script again
-	  unlink($filename);
+	  //unlink($filename);
     }
   } else {
   	echo $data->message."\n";
