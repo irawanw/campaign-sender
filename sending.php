@@ -54,6 +54,12 @@ if ($err) {
     	$data = $data[0];
 
     	$curl = curl_init();
+		
+		$fields = array(
+          'emc_status' => 'sending',
+          'emc_date_start' => date('Y-m-d H:i:s'),
+        );  
+        $fields_string = http_build_query($fields);
 
     	//set status to sending
     	curl_setopt_array($curl, array(
@@ -64,7 +70,7 @@ if ($err) {
     	  CURLOPT_TIMEOUT => 30,
     	  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     	  CURLOPT_CUSTOMREQUEST => "PUT",
-    	  CURLOPT_POSTFIELDS => "emc_status=sending",
+    	  CURLOPT_POSTFIELDS => $fields_string,
     	  CURLOPT_HTTPHEADER => array(	    
     	  	"content-type: application/x-www-form-urlencoded",
     	    "x-api-key: ".API_KEY
@@ -99,7 +105,8 @@ if ($err) {
             //Recipients
 			$sender_friendly_name = preg_split('/[@.]/', $data->ema_account);			
 			
-            $mail->setFrom($data->ema_account, ucwords($sender_friendly_name[0]), ' ', ucwords($sender_friendly_name[1]));
+            //$mail->setFrom($data->ema_account, ucwords($sender_friendly_name[0]), ' ', ucwords($sender_friendly_name[1]));
+			$mail->setFrom($data->ema_account, "Macom de mairie");
 			$mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
@@ -123,10 +130,41 @@ if ($err) {
 		
 		flush();
 		ob_flush();
+		
+		//update the progress
+		$fields = array(
+          'emc_progress' => $total_sent
+        );  
+        $fields_string = http_build_query($fields);
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "PUT",
+          CURLOPT_POSTFIELDS => $fields_string,
+          CURLOPT_HTTPHEADER => array(      
+            "content-type: application/x-www-form-urlencoded",
+            "x-api-key: ".API_KEY
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
       }
 
       //set status to completed
       if($total_sent == count($emails)) {
+		  
+		//deleting send.lock
+		//it will release cron to call this script again
+		unlink($filename);  
+		  
         //set status to complete
         $fields = array(
           'emc_status' => 'completed',
