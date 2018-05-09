@@ -27,6 +27,7 @@ function callbackAction($msgnum, $bounceType, $email, $subject, $xheader, $remov
 {
   global $bounce_type;
   global $bounce_reason;
+  global $bounce_detail;
   
   $displayData = prepData($email, $bounceType, $remove);
   $bounceType = $displayData['bounce_type'];
@@ -37,6 +38,9 @@ function callbackAction($msgnum, $bounceType, $email, $subject, $xheader, $remov
   
   $bounce_type[$bounceType] += 1;
   $bounce_reason[$ruleCat] += 1;
+  $bounce_detail .= $email.'|'.$bounceType.'|'.$ruleCat."\n";
+  
+  //echo $bounce_detail."aaa";
   
   return true;
 }

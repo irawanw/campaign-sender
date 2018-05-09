@@ -4,9 +4,10 @@ error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
 set_time_limit(0);
 
-//define('API_URL', 'http://svr.bonenvoi.com/email-campaign/index.php/api/');
+//define('API_URL', 'http://svr.bonenvoi.com/trie-version-24/index.php/api/');
 define('API_URL', 'http://crm.bal-idf.com/index.php/api/');
 define('API_KEY', 'D9dqvZ5O1iCV1ecAEvGydnb68Fzoe1Ey7WMlgU3W');
+define('SIMULTANEOUS', 5);
 
 //global array for saving the bounce category count
 global $bounce_type;			
@@ -40,3 +41,6 @@ $bounce_reason['unknown'] = 0;
 $bounce_reason['unrecognized'] = 0;
 $bounce_reason['user_reject'] = 0;
 $bounce_reason['warning'] = 0;
+
+global $bounce_detail;
+$bounce_detail = '';
