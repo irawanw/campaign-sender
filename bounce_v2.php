@@ -57,7 +57,8 @@ $bmh->disableDelete = true; // false is default, no need to specify
 //$bmh->processMailbox();
 
 $data = new stdClass;
-$data->emc_id = 4;
+//debugging
+//$data->emc_id = 4;
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
