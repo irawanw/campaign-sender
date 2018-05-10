@@ -48,7 +48,7 @@ $bmh->verbose = BounceMailHandler::VERBOSE_SIMPLE; //BounceMailHandler::VERBOSE_
 //$bmh->debugBodyRule      = false; // false is default, no need to specify
 //$bmh->debugDsnRule       = false; // false is default, no need to specify
 //$bmh->purgeUnprocessed   = false; // false is default, no need to specify
-$bmh->disableDelete = true; // false is default, no need to specify
+//$bmh->disableDelete = true; // false is default, no need to specify
 
 /*
  * for local mailbox (to process .EML files)
