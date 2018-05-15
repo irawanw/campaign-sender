@@ -56,7 +56,7 @@ $bmh->verbose = BounceMailHandler::VERBOSE_SIMPLE; //BounceMailHandler::VERBOSE_
 //$bmh->openLocal('/home/email/temp/mailbox');
 //$bmh->processMailbox();
 
-$data = new stdClass;
+//$data = new stdClass;
 //debugging
 //$data->emc_id = 4;
 
