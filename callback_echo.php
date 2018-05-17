@@ -28,17 +28,23 @@ function callbackAction($msgnum, $bounceType, $email, $subject, $xheader, $remov
   global $bounce_type;
   global $bounce_reason;
   global $bounce_detail;
+  global $unsubscribe_detail;
   
   $displayData = prepData($email, $bounceType, $remove);
   $bounceType = $displayData['bounce_type'];
   $emailName = $displayData['emailName'];
   $emailAddy = $displayData['emailAddy'];
-  $remove = $displayData['remove'];
-  echo $msgnum . ': ' . $ruleNo . ' | ' . $ruleCat . ' | ' . $bounceType . ' | ' . $remove . ' | ' . $email . ' | ' . $subject . "<br />\n";
+  $remove = $displayData['remove'];  
   
-  $bounce_type[$bounceType] += 1;
-  $bounce_reason[$ruleCat] += 1;
-  $bounce_detail .= $email.'|'.$bounceType.'|'.$ruleCat."\n";
+  if($ruleCat != 'unsubscribe'){
+	echo $msgnum . ': ' . $ruleNo . ' | ' . $ruleCat . ' | ' . $bounceType . ' | ' . $remove . ' | ' . $email . ' | ' . $subject . "<br />\n";  
+    $bounce_type[$bounceType] += 1;
+    $bounce_reason[$ruleCat] += 1;
+    $bounce_detail .= $email.'|'.$bounceType.'|'.$ruleCat.'|'.date("Y-m-d H:i:s")."\n";
+  } else {
+	echo 'Unsub '.$msgnum . ': ' . $ruleNo . ' | ' . $ruleCat . ' | ' . $bounceType . ' | ' . $remove . ' | ' . $email . ' | ' . $subject . "<br />\n";
+    $unsubscribe_detail .= $email.'|'.date("Y-m-d H:i:s")."\n";
+  }
   
   //echo $bounce_detail."aaa";
   

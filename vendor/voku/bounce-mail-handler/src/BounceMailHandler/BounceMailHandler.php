@@ -766,8 +766,14 @@ class BounceMailHandler
 
       return false;
     }
-
-    $email = $result['email'];
+	
+	if($result['email'] == ''){
+		$sender = $header->sender;
+		$email = $sender[0]->mailbox.'@'.$sender[0]->host;
+	}
+	else {
+		$email = $result['email'];
+	}
     $bounceType = $result['bounce_type'];
 
     // workaround: I think there is a error in one of the reg-ex in "phpmailer-bmh_rules.php".

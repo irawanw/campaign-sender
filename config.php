@@ -4,10 +4,11 @@ error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
 set_time_limit(0);
 
-//define('API_URL', 'http://svr.bonenvoi.com/trie-version-24/index.php/api/');
 define('API_URL', 'http://crm.bal-idf.com/index.php/api/');
-define('API_KEY', 'D9dqvZ5O1iCV1ecAEvGydnb68Fzoe1Ey7WMlgU3W');
-define('SIMULTANEOUS', 5);
+//define('API_URL', 'http://svr.bonenvoi.com/trie-version-22/index.php/api/');
+define('API_KEY', '9c09de2c-ecfe-4b3e-9a21-30ccd4e2d84b');
+define('SIMULTANEOUS', 10);
+define('TIMEFRAME', 14*24*60*60); //(check email for 7 days before)
 
 //global array for saving the bounce category count
 global $bounce_type;			
@@ -44,3 +45,6 @@ $bounce_reason['warning'] = 0;
 
 global $bounce_detail;
 $bounce_detail = '';
+
+global $unsubscribe_detail;
+$unsubscribe_detail = '';

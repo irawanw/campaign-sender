@@ -26,9 +26,9 @@ ob_flush();
 
 //count processing
 $curl = curl_init();
-curl_setopt_array($curl, array(
-  //CURLOPT_URL => API_URL."email_campaign?status=sending&ip=".getHostByName(getHostName()),
-  CURLOPT_URL => API_URL."email_campaign?status=sending",
+curl_setopt_array($curl, array(  
+  //CURLOPT_URL => API_URL."email_campaign?status=sending",
+  CURLOPT_URL => API_URL."email_campaign?status=sending&ip=".getHostByName(getHostName()),
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
@@ -88,7 +88,7 @@ if ($err) {
 		$fields = array(
           'emc_status' => 'sending',		  
           'emc_date_start' => date('Y-m-d H:i:s'),
-		  //'emc_server_sending' => getHostByName(getHostName()),
+		  'emc_server_sending' => getHostByName(getHostName()),
         );  
         $fields_string = http_build_query($fields);
 
@@ -134,19 +134,23 @@ if ($err) {
 	  $rotate_email = preg_split('/\|/', $data->email);
 	  $rotate_site_internet = preg_split('/\|/', $data->site_internet);
 	  $rotate_text_repondre = preg_split('/\|/', $data->text_repondre);
-	  //$rotate_sender_name = preg_split('/\|/', $data->sender_name);
+	  $rotate_email_subject = preg_split('/\|/', $data->emc_email_subject);
+	  $rotate_sender_name = preg_split('/\|/', $data->sender_name);
 
 	  $sending = 0;
 	  $rotate_number_telephone = 0;
 	  $rotate_number_email = 0;
 	  $rotate_number_site_internet = 0;
 	  $rotate_number_text_repondre = 0;
-	  //$rotate_number_sender_name = 0;
+	  $rotate_number_email_subject = 0;
+	  $rotate_number_sender_name = 0;
 	  $rotate_email_body = '';
 	  
       foreach($emails as $email) {
-				
-		//$sender_name = $data->sender_name;
+		
+		//default value without rotation
+	    $sender_name = $data->sender_name;
+		$email_subject = $data->emc_email_subject;
 		
 		if($sending % $data->rotate == 0 && $data->rotate != 0){			
 			
@@ -154,21 +158,24 @@ if ($err) {
 			$rotate_email_body = str_replace( '[email]', $rotate_email[$rotate_number_email], $rotate_email_body);
 			$rotate_email_body = str_replace( '[site-internet]', $rotate_site_internet[$rotate_number_site_internet], $rotate_email_body);
 			$rotate_email_body = str_replace( '[text-repondre]', $rotate_text_repondre[$rotate_number_text_repondre], $rotate_email_body);
-			//$sender_name = $rotate_sender_name[$rotate_number_sender_name];
+			$email_subject = $rotate_email_subject[$rotate_number_email_subject];
+			$sender_name = $rotate_sender_name[$rotate_number_sender_name];
 			//echo $rotate_email_body."<hr><br><br>";
 		    
 			$rotate_number_telephone++;
          	$rotate_number_email++;
 	        $rotate_number_site_internet++;
 	        $rotate_number_text_repondre++;
-			//$rotate_number_sender_name++;
+			$rotate_number_email_subject++;
+			$rotate_number_sender_name++;
 			
 			//reset rotate number if exceed than number of array count
 			if($rotate_number_telephone == count($rotate_telephone)) $rotate_number_telephone = 0;
 			if($rotate_number_email == count($rotate_email)) $rotate_number_email = 0;
 			if($rotate_number_site_internet == count($rotate_site_internet)) $rotate_number_site_internet = 0;
 			if($rotate_number_text_repondre == count($rotate_text_repondre)) $rotate_number_text_repondre = 0;
-			//if($rotate_number_sender_name == count($rotate_sender_name)) $rotate_number_sender_name = 0;
+			if($rotate_number_email_subject == count($rotate_email_subject)) $rotate_number_email_subject = 0;
+			if($rotate_number_sender_name == count($rotate_sender_name)) $rotate_number_sender_name = 0;
 			
 		}
 		$sending++;
@@ -180,15 +187,17 @@ if ($err) {
 			//$mail->setFrom($data->ema_account, "Macom de mairie");
 			
 			//Change to rotate sender name
-			$mail->setFrom($data->ema_account, $data->emc_sender_name);
-			//$mail->setFrom($data->ema_account, $sender_name);
+			//$mail->setFrom($data->ema_account, $data->emc_sender_name);
+			$mail->setFrom($data->ema_account, $sender_name);
+			
 			$mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
             //Content
             $mail->isHTML(true);
-            $mail->Subject = $data->emc_email_subject;
+            //$mail->Subject = $data->emc_email_subject;
+			$mail->Subject = $email_subject;
             
 			//no rotation message
 			if($rotate_email_body == ''){

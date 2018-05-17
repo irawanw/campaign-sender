@@ -56,19 +56,15 @@ $bmh->verbose = BounceMailHandler::VERBOSE_SIMPLE; //BounceMailHandler::VERBOSE_
 //$bmh->openLocal('/home/email/temp/mailbox');
 //$bmh->processMailbox();
 
-//debugging
-//$data = new stdClass;
-//$data->emc_id = 4;
-if(!isset($data->emc_id))
-	die('No campagin id was set');
+echo API_URL."/email_campaign?date_sent=".(time()-TIMEFRAME)."&server_sending=".getHostByName(getHostName());
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
-  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+  CURLOPT_URL => API_URL."/email_campaign?date_sent=".(time()-TIMEFRAME)."&server_sending=".getHostByName(getHostName()),
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 30,
+  CURLOPT_TIMEOUT => 60,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
@@ -77,26 +73,21 @@ curl_setopt_array($curl, array(
 ));
 
 $response = curl_exec($curl);
+
 $err = curl_error($curl);
+
 curl_close($curl);
 
-if ($err) 
-{
+if ($err) {
   echo "cURL Error #:" . $err;
-} 
-else 
-{
-	$bounce_data = json_decode($response);
-	
-	//echo "<pre>";
-	//print_r($bounce_data);
-	//echo "</pre>";
-	//die();
+} else {
 
-	if(!isset($bounce_data->status)) {
-		if(count($bounce_data) > 0) {
+	$email_data = json_decode($response);
+	
+	if(is_array($email_data)){
+		
+		foreach($email_data as $bounce_data){		
 			
-			//$bounce_data = $bounce_data[0];
 			$mail_addr = $bounce_data->ema_account;
 			$mail_pass = $bounce_data->ema_password;
 			$imap_host = $bounce_data->ema_imap_addr;
@@ -188,7 +179,7 @@ else
 
 			//set number of bounce mail
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+			  CURLOPT_URL => API_URL."email_campaign/".$bounce_data->emc_id,
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,
@@ -216,7 +207,7 @@ else
 
 			//set number of bounce mail
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?noreplace=yes',
+			  CURLOPT_URL => API_URL."email_campaign/".$bounce_data->emc_id.'?noreplace=yes',
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,
@@ -236,7 +227,8 @@ else
 			curl_close($curl);
 		}
 	}
-}
+}		
+
 
 /**
  * @return float
