@@ -28,7 +28,7 @@ ob_flush();
 $curl = curl_init();
 curl_setopt_array($curl, array(  
   //CURLOPT_URL => API_URL."email_campaign?status=sending",
-  CURLOPT_URL => API_URL."email_campaign?status=sending&ip=".getHostByName(getHostName()),
+  CURLOPT_URL => API_URL."email_campaign?status=sending&ip=".SERVER_IP),
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
@@ -88,7 +88,7 @@ if ($err) {
 		$fields = array(
           'emc_status' => 'sending',		  
           'emc_date_start' => date('Y-m-d H:i:s'),
-		  'emc_server_sending' => getHostByName(getHostName()),
+		  'emc_server_sending' => SERVER_IP),
         );  
         $fields_string = http_build_query($fields);
 

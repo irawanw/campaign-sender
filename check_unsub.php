@@ -56,11 +56,9 @@ $bmh->verbose = BounceMailHandler::VERBOSE_SIMPLE; //BounceMailHandler::VERBOSE_
 //$bmh->openLocal('/home/email/temp/mailbox');
 //$bmh->processMailbox();
 
-echo API_URL."/email_campaign?date_sent=".(time()-TIMEFRAME)."&server_sending=".getHostByName(getHostName());
-
 $curl = curl_init();
 curl_setopt_array($curl, array(
-  CURLOPT_URL => API_URL."/email_campaign?date_sent=".(time()-TIMEFRAME)."&server_sending=".getHostByName(getHostName()),
+  CURLOPT_URL => API_URL."/email_campaign?date_sent=".(time()-TIMEFRAME)."&server_sending=".SERVER_IP,
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,

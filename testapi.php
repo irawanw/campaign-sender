@@ -2,7 +2,7 @@
 
 include('config.php');
 
-echo 'alt 1 : '.$_SERVER['SERVER_ADDR'];
+echo 'alt 1 : '.file_get_contents("http://ipecho.net/plain");
 echo 'alt 2 : '.getHostByName(getHostName());
 
 /*

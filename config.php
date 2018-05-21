@@ -10,6 +10,7 @@ define('API_URL', 'http://crm.bal-idf.com/index.php/api/');
 define('API_KEY', 'D9dqvZ5O1iCV1ecAEvGydnb68Fzoe1Ey7WMlgU3W');
 define('SIMULTANEOUS', 10);
 define('TIMEFRAME', 14*24*60*60); //(check email for 7 days before)
+define('SERVER_IP', file_get_contents("http://ipecho.net/plain"));
 
 //global array for saving the bounce category count
 global $bounce_type;			
