@@ -8,7 +8,7 @@ define('API_URL', 'http://crm.bal-idf.com/index.php/api/');
 //define('API_URL', 'http://svr.bonenvoi.com/trie-version-22/index.php/api/');
 //define('API_KEY', '9c09de2c-ecfe-4b3e-9a21-30ccd4e2d84b');
 define('API_KEY', 'D9dqvZ5O1iCV1ecAEvGydnb68Fzoe1Ey7WMlgU3W');
-define('SIMULTANEOUS', 10);
+define('SIMULTANEOUS', 2);
 define('TIMEFRAME', 14*24*60*60); //(check email for 7 days before)
 define('SERVER_IP', file_get_contents("http://ipecho.net/plain"));
 
