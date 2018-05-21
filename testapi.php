@@ -2,6 +2,42 @@
 
 include('config.php');
 
+echo 'alt 1 : '.$_SERVER['SERVER_ADDR'];
+echo 'alt 2 : '.getHostByName(getHostName());
+
+/*
+$curl = curl_init();
+curl_setopt_array($curl, array(
+  //CURLOPT_URL => API_URL."email_campaign?status=completed&limit=1",
+  //CURLOPT_URL => API_URL."/email_campaign?date_sent=1507804000&server_sending=137.74.247.69",
+  CURLOPT_URL => API_URL."/notify_segment_exported/10",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 60,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "PUT",
+  CURLOPT_HTTPHEADER => array(    
+    "x-api-key: ".API_KEY
+  ),
+));
+
+$response = curl_exec($curl);
+
+$err = curl_error($curl);
+
+curl_close($curl);
+
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+	$data = json_decode($response);
+	echo "<pre>";
+	print_r($data);
+	echo "</pre>";
+}
+
+/*
 //update the progress
 $fields = array(
   'emc_num_email_sent' => 10
@@ -31,5 +67,6 @@ curl_close($curl);
 echo "<pre>";
 print_r($response);
 echo "</pre>";
+*/
 
 ?>
