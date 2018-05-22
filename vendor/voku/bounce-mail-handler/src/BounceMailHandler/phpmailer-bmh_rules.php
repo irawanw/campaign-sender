@@ -86,7 +86,7 @@ function bmhBodyRules($body, /** @noinspection PhpUnusedParameterInspection */ $
   
   // custom role to detect unsubscribe
   // for now it will same process as detect bounce
-  if (preg_match("/\b(desabonnez|desabonez|désabonez|désabonnez|desaboner|desabonner|désaboner|désabonner|désabonnement|desabonement|desabonnement|loi|CNIL|arrêt|arret|areter|arêter|arreter|arrêter|stop|stop mails|stop mail)\b/i", $body, $match)) {
+  if (preg_match("/\b(desabonnez|desabonez|désabonez|désabonnez|desaboner|desabonner|désaboner|désabonner|désabonnement|desabonement|desabonnement|loi|CNIL|arrêt|arret|areter|arêter|arreter|arrêter|stop|stop mails|stop mail|S-T-O-P)\b/i", $body, $match)) {
     $result['rule_cat'] = 'unsubscribe';
     $result['rule_no'] = '7777';
   }
