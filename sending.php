@@ -88,7 +88,7 @@ if ($err) {
 		$fields = array(
           'emc_status' => 'sending',		  
           'emc_date_start' => date('Y-m-d H:i:s'),
-		  'emc_server_sending' => SERVER_IP),
+		  'emc_server_sending' => SERVER_IP,
         );  
         $fields_string = http_build_query($fields);
 
