@@ -22,7 +22,7 @@ Eden\Core\Control::i();
 
 //flusing output
 flush();
-ob_flush()
+ob_flush();
 
 //count processing
 $curl = curl_init();
