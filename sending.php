@@ -28,7 +28,7 @@ ob_flush();
 $curl = curl_init();
 curl_setopt_array($curl, array(  
   //CURLOPT_URL => API_URL."email_campaign?status=sending",
-  CURLOPT_URL => API_URL."email_campaign?status=sending&ip=".SERVER_IP,
+  CURLOPT_URL => API_URL."email_campaign?status=sending&server_sending=".SERVER_IP,
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
