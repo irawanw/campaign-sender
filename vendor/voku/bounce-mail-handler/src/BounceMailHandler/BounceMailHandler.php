@@ -322,7 +322,8 @@ class BounceMailHandler
 
     $port = $this->port . '/' . $this->service . '/' . $this->serviceOption;
 
-    set_time_limit(6000);
+    //set_time_limit(6000);
+	set_time_limit(10);
 
     if (!$this->testMode) {
       $this->mailboxLink = imap_open('{' . $this->mailhost . ':' . $port . '}' . $this->boxname, $this->mailboxUserName, $this->mailboxPassword, CL_EXPUNGE | ($this->testMode ? OP_READONLY : 0));
