@@ -62,7 +62,7 @@ curl_setopt_array($curl, array(
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 60,
+  CURLOPT_TIMEOUT => 10,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
@@ -88,8 +88,16 @@ if ($err) {
 			
 			$mail_addr = $bounce_data->ema_account;
 			$mail_pass = $bounce_data->ema_password;
-			$imap_host = $bounce_data->ema_imap_addr;
-			$imap_port = (int)$bounce_data->ema_imap_port;
+			
+			if($bounce_data->ema_imap_addr != ''){
+				$imap_host = $bounce_data->ema_imap_addr;
+				$imap_port = (int)$bounce_data->ema_imap_port;
+				$imap_service = 'imap';
+			} elseif($bounce_data->ema_pop3_addr != '') {
+				$imap_host = $bounce_data->ema_pop3_addr;
+				$imap_port = (int)$bounce_data->ema_pop3_port;
+				$imap_service = 'pop3';				
+			}
 		
 			/*
 			 * for remote mailbox
@@ -99,7 +107,7 @@ if ($err) {
 			$bmh->mailboxUserName = $mail_addr; // your mailbox username
 			$bmh->mailboxPassword = $mail_pass; // your mailbox password
 			$bmh->port = $imap_port; 			// the port to access your mailbox, default is 143
-			$bmh->service = 'imap'; 			// the service to use (imap or pop3), default is 'imap'
+			$bmh->service = $imap_service; 		// the service to use (imap or pop3), default is 'imap'
 			$bmh->serviceOption = 'ssl'; 		// the service options (none, tls, notls, ssl, etc.), default is 'notls'
 			$bmh->boxname = 'INBOX'; 			// the mailbox to access, default is 'INBOX'
 			//$bmh->moveHard           = true; // default is false
@@ -181,7 +189,7 @@ if ($err) {
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,
-			  CURLOPT_TIMEOUT => 30,
+			  CURLOPT_TIMEOUT => 10,
 			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			  CURLOPT_CUSTOMREQUEST => "PUT",
 			  CURLOPT_POSTFIELDS => $fields_string,
@@ -209,7 +217,7 @@ if ($err) {
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,
-			  CURLOPT_TIMEOUT => 30,
+			  CURLOPT_TIMEOUT => 10,
 			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			  CURLOPT_CUSTOMREQUEST => "PUT",
 			  CURLOPT_POSTFIELDS => $fields_string,
