@@ -32,7 +32,7 @@ curl_setopt_array($curl, array(
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 60,
+  CURLOPT_TIMEOUT => 10,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
@@ -56,11 +56,12 @@ if ($err) {
 //get ready status
 $curl = curl_init();
 curl_setopt_array($curl, array(
-  CURLOPT_URL => API_URL."email_campaign?status=ready&limit=1",
+  //CURLOPT_URL => API_URL."email_campaign?status=draft&limit=1",
+  CURLOPT_URL => API_URL."email_campaign?status=ready&limit=1&server_sending=".SERVER_IP,
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 60,
+  CURLOPT_TIMEOUT => 10,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
@@ -83,6 +84,40 @@ if ($err) {
     if(count($data) > 0) {
     	$data = $data[0];
 
+		//calculate number of slot
+		//split email sending between multiple slot using multiple server_sending
+		//so we divide email according to slot
+		$slot = preg_split("#,#", $data->emc_email_account);
+		$emails = explode("\n", $data->emc_email_target);
+		$servers = explode("|", $data->emc_server_sending);
+		
+		$email_per_slot = floor(count($emails)/count($slot));
+		$current_slot = count($servers);
+		$start_line = $current_slot * $email_per_slot;
+				
+		//last slot
+		//last line will used last item of emails
+		if(count($slot) == count($servers)+1){
+			$stop_line = count($emails)-1; 
+		} else {
+			$stop_line = $start_line + ($email_per_slot-1); 
+		}
+		
+		$list_emails = array();
+		for($i=$start_line ; $i<=$stop_line; $i++){
+			$list_emails[] = $emails[$i];
+		}
+		
+		//change emails variable using list emails
+		//$emails = $list_emails;
+		
+		//print_r($data);
+		//echo "count email : ".count($slot)."\n";
+		//echo "start line : ".$start_line."\n";
+		//echo "stop line : ".$stop_line."\n";
+		//print_r($emails);
+		//die();
+
     	$curl = curl_init();
 		
 		$fields = array(
@@ -98,7 +133,7 @@ if ($err) {
     	  CURLOPT_RETURNTRANSFER => true,
     	  CURLOPT_ENCODING => "",
     	  CURLOPT_MAXREDIRS => 10,
-    	  CURLOPT_TIMEOUT => 60,
+    	  CURLOPT_TIMEOUT => 10,
     	  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     	  CURLOPT_CUSTOMREQUEST => "PUT",
     	  CURLOPT_POSTFIELDS => $fields_string,
@@ -112,41 +147,41 @@ if ($err) {
     	$err = curl_error($curl);
     	curl_close($curl);
     	
-      //send mail
-      $mail = new PHPMailer(true);
-	  $mail->CharSet = 'UTF-8';  
+		//send mail
+		$mail = new PHPMailer(true);
+		$mail->CharSet = 'UTF-8';  
 
-      $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-      $mail->isSMTP();                                      // Set mailer to use SMTP
-      $mail->Host = $data->ema_smtp_addr;  // Specify main and backup SMTP servers
-      $mail->SMTPAuth = true;                               // Enable SMTP authentication
-      $mail->Username = $data->ema_account;                 // SMTP username
-      $mail->Password = $data->ema_password;                           // SMTP password
-      $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
-      $mail->Port = $data->ema_smtp_port; 
-      
-      $emails = explode("\n", $data->emc_email_target);
-      $delay = (int)$data->emc_delay;
-      $total_sent = 0;
-      $total_success_sent = 0;
-	  
-	  $rotate_telephone = preg_split('/\|/', $data->telephone);
-	  $rotate_email = preg_split('/\|/', $data->email);
-	  $rotate_site_internet = preg_split('/\|/', $data->site_internet);
-	  $rotate_text_repondre = preg_split('/\|/', $data->text_repondre);
-	  $rotate_email_subject = preg_split('/\|/', $data->emc_email_subject);
-	  $rotate_sender_name = preg_split('/\|/', $data->sender_name);
+		$mail->SMTPDebug = 2;                                 // Enable verbose debug output
+		$mail->isSMTP();                                      // Set mailer to use SMTP
+		$mail->Host = $data->ema_smtp_addr;  // Specify main and backup SMTP servers
+		$mail->SMTPAuth = true;                               // Enable SMTP authentication
+		$mail->Username = $data->ema_account;                 // SMTP username
+		$mail->Password = $data->ema_password;                           // SMTP password
+		$mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+		$mail->Port = $data->ema_smtp_port; 
 
-	  $sending = 0;
-	  $rotate_number_telephone = 0;
-	  $rotate_number_email = 0;
-	  $rotate_number_site_internet = 0;
-	  $rotate_number_text_repondre = 0;
-	  $rotate_number_email_subject = 0;
-	  $rotate_number_sender_name = 0;
-	  $rotate_email_body = '';
-	  
-      foreach($emails as $email) {
+
+		$delay = (int)$data->emc_delay;
+		$total_sent = 0;
+		$total_success_sent = 0;
+
+		$rotate_telephone = preg_split('/\|/', $data->telephone);
+		$rotate_email = preg_split('/\|/', $data->email);
+		$rotate_site_internet = preg_split('/\|/', $data->site_internet);
+		$rotate_text_repondre = preg_split('/\|/', $data->text_repondre);
+		$rotate_email_subject = preg_split('/\|/', $data->emc_email_subject);
+		$rotate_sender_name = preg_split('/\|/', $data->sender_name);
+
+		$sending = 0;
+		$rotate_number_telephone = 0;
+		$rotate_number_email = 0;
+		$rotate_number_site_internet = 0;
+		$rotate_number_text_repondre = 0;
+		$rotate_number_email_subject = 0;
+		$rotate_number_sender_name = 0;
+		$rotate_email_body = '';
+
+		foreach($emails as $email) {
 		
 		//default value without rotation
 	    $sender_name = $data->sender_name;
@@ -216,9 +251,48 @@ if ($err) {
 
             $mail->send();
             echo 'Message has been sent to '.$email.'<br>';
-            $total_success_sent += 1;         
+            $total_success_sent += 1;      
+
+			//count processing and sent
+			$curl = curl_init();
+			curl_setopt_array($curl, array(  
+			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=success_sent',
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 10,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "GET",
+			  CURLOPT_HTTPHEADER => array(    
+				"x-api-key: ".API_KEY
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+			curl_close($curl);
+			
         } catch (Exception $e) {
             echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+			
+			//count processing
+			$curl = curl_init();
+			curl_setopt_array($curl, array(  
+			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=fail_sent',
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 10,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "GET",
+			  CURLOPT_HTTPHEADER => array(    
+				"x-api-key: ".API_KEY
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+			curl_close($curl);			
         }
 
         $total_sent += 1;
@@ -228,6 +302,7 @@ if ($err) {
 		ob_flush();
 		
 		//update the progress
+		/*
 		$fields = array(
           'emc_num_email_sent' => $total_sent
         );  
@@ -239,7 +314,7 @@ if ($err) {
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
           CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 60,
+          CURLOPT_TIMEOUT => 10,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "PUT",
           CURLOPT_POSTFIELDS => $fields_string,
@@ -252,6 +327,7 @@ if ($err) {
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
+		*/
       }
 
       //set status to completed
@@ -275,7 +351,7 @@ if ($err) {
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
           CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 30,
+          CURLOPT_TIMEOUT => 10,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "PUT",
           CURLOPT_POSTFIELDS => $fields_string,

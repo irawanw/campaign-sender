@@ -320,7 +320,7 @@ class BounceMailHandler
       $this->moveHard = false;
     }
 
-    $port = $this->port . '/' . $this->service . '/' . $this->serviceOption;
+    $port = $this->port . '/' . $this->service . '/' . $this->serviceOption . '/' . 'novalidate-cert';
 
     //set_time_limit(6000);
 	set_time_limit(10);
