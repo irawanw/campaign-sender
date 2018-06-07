@@ -113,7 +113,8 @@ if ($err) {
 		
 		$list_emails = array();
 		for($i=$start_line ; $i<=$stop_line; $i++){
-			$list_emails[] = $emails[$i];
+			if($emails[$i] != '');
+				$list_emails[] = $emails[$i];
 		}
 		
 		//change emails variable using list emails
