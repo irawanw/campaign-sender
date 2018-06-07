@@ -140,7 +140,8 @@ if ($err) {
 		  'emc_last_email' => $stop_line,
         );  
 		
-		if(count($slot) == count($servers)+1)
+		//seems not working
+		//if(count($slot) == count($servers)+1)
 			$fields['emc_slot_full'] = 1;
 		
         $fields_string = http_build_query($fields);
