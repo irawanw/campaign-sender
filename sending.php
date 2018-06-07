@@ -45,19 +45,22 @@ $err = curl_error($curl);
 
 curl_close($curl);
 
-if ($err) {
-  echo "cURL Error #:" . $err;
-} else {
+if ($err) 
+{
+	echo "cURL Error #:" . $err;
+} 
+else 
+{  
   $data = json_decode($response);
   if( count($data) >= SIMULTANEOUS && $data->message == '')
 	  die('Sending still in progress ('.count($data).') exiting...');
 }
 
+
 //get ready status
 $curl = curl_init();
 curl_setopt_array($curl, array(
-  //CURLOPT_URL => API_URL."email_campaign?status=draft&limit=1",
-  CURLOPT_URL => API_URL."email_campaign?status=ready&limit=1&server_sending=".SERVER_IP,
+  CURLOPT_URL => API_URL."email_campaign?status=ready&limit=1",
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
@@ -89,11 +92,16 @@ if ($err) {
 		//so we divide email according to slot
 		$slot = preg_split("#,#", $data->emc_email_account);
 		$emails = explode("\n", $data->emc_email_target);
-		$servers = explode("|", $data->emc_server_sending);
+		$servers = explode("|", $data->emc_server_sending);		
+		$email_per_slot = ceil(count($emails)/count($slot));
 		
-		$email_per_slot = floor(count($emails)/count($slot));
 		$current_slot = count($servers);
-		$start_line = $current_slot * $email_per_slot;
+		if($servers[0] == ''){
+			$current_slot = 0;
+			$servers = '';
+		}
+		
+		$start_line = ($current_slot) * $email_per_slot;
 				
 		//last slot
 		//last line will used last item of emails
@@ -109,22 +117,32 @@ if ($err) {
 		}
 		
 		//change emails variable using list emails
-		//$emails = $list_emails;
+		$emails = $list_emails;
 		
 		//print_r($data);
-		//echo "count email : ".count($slot)."\n";
-		//echo "start line : ".$start_line."\n";
-		//echo "stop line : ".$stop_line."\n";
-		//print_r($emails);
-		//die();
+		//echo "per slot email : ".($email_per_slot)."<br>\n";
+		//echo "count server : ".($current_slot)."<br>\n";
+		//echo "count email : ".count($slot)."<br>\n";
+		//echo "start line : ".$start_line."<br>\n";
+		//echo "stop line : ".$stop_line."<br>\n";
 
     	$curl = curl_init();
+		
+		if($servers == '')
+			$update_servers = SERVER_IP;
+		else
+			$update_servers = trim(implode("\n", $servers))."\n".SERVER_IP;
 		
 		$fields = array(
           'emc_status' => 'sending',		  
           'emc_date_start' => date('Y-m-d H:i:s'),
-		  'emc_server_sending' => SERVER_IP,
+		  'emc_server_sending' => $update_servers,
+		  'emc_last_email' => $stop_line,
         );  
+		
+		if(count($slot) == count($servers)+1)
+			$fields['emc_slot_full'] = 1;
+		
         $fields_string = http_build_query($fields);
 
     	//set status to sending
