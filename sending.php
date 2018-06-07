@@ -95,11 +95,16 @@ if ($err) {
 		$servers = explode("|", $data->emc_server_sending);		
 		$email_per_slot = ceil(count($emails)/count($slot));
 		
+		//remove empty array
+		$slot = array_filter($slot);
+		$emails = array_filter($emails);
+		$servers = array_filter($servers);
+		
 		$current_slot = count($servers);
-		if($servers[0] == ''){
-			$current_slot = 0;
-			$servers = '';
-		}
+		//if($servers[0] == '' && count($servers) == 1){
+		//	$current_slot = 0;
+		//	$servers = '';
+		//}
 		
 		$start_line = ($current_slot) * $email_per_slot;
 				
@@ -141,8 +146,7 @@ if ($err) {
 		  'emc_last_email' => $stop_line,
         );  
 		
-		//seems not working
-		//if(count($slot) == count($servers)+1)
+		if(count($slot) == count($servers)+1)
 			$fields['emc_slot_full'] = 1;
 		
         $fields_string = http_build_query($fields);
