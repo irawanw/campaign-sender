@@ -2,21 +2,35 @@
 
 include('config.php');
 
-echo 'alt 1 : '.file_get_contents("http://ipecho.net/plain");
-echo 'alt 2 : '.getHostByName(getHostName());
+$test_array[] = '';
+
+print_r($test_array);
+
+print_r(array_filter($test_array));
+
+exec("ps aux | grep php", $process);
+$process = count($process) - 3;
+if($process >= SIMULTANEOUS)
+	die('Sending still in progress ('.count($data).') exiting...');
 
 /*
+//echo 'alt 1 : '.file_get_contents("http://ipecho.net/plain");
+//echo 'alt 2 : '.getHostByName(getHostName());
+
+echo API_URL."email_campaign/14";
+
 $curl = curl_init();
 curl_setopt_array($curl, array(
   //CURLOPT_URL => API_URL."email_campaign?status=completed&limit=1",
   //CURLOPT_URL => API_URL."/email_campaign?date_sent=1507804000&server_sending=137.74.247.69",
-  CURLOPT_URL => API_URL."/notify_segment_exported/10",
+  //CURLOPT_URL => API_URL."/notify_segment_exported/10",
+  CURLOPT_URL => API_URL."email_campaign/14?action=fail_sent",
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
   CURLOPT_TIMEOUT => 60,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => "PUT",
+  CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => array(    
     "x-api-key: ".API_KEY
   ),
