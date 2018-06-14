@@ -151,8 +151,51 @@ if ($err) {
 		$data->ema_pop3_addr = $email_account_data[6];
 		$data->ema_pop3_port = $email_account_data[7];
 		
+		
+		//old buggy data
+		//will force to complete
+		//and set slot full to 1
+		if(count($slot) < count($servers)+1)
+		{
+			if($servers == '')
+				$update_servers = SERVER_IP;
+			else
+				$update_servers = trim(implode("\n", $servers))."\n".SERVER_IP;
+			
+			$fields = array(
+			  'emc_status' => 'completed',		  
+			  'emc_date_sent' => date('Y-m-d H:i:s'),
+			  'emc_slot_full' => 1
+			);  
+			
+			$fields_string = http_build_query($fields);
+
+			//set status to sending
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 10,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "PUT",
+			  CURLOPT_POSTFIELDS => $fields_string,
+			  CURLOPT_HTTPHEADER => array(	    
+				"content-type: application/x-www-form-urlencoded",
+				"x-api-key: ".API_KEY
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+			curl_close($curl);
+		}
+		
+		
 		if($data->ema_account == '' || $data->ema_password == '')
+		{
 			die('Error when using email account and password.. its empty');
+		}
 
     	$curl = curl_init();
 		
