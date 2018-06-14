@@ -25,6 +25,8 @@ flush();
 ob_flush();
 
 //count processing
+//too many resources
+/*
 $curl = curl_init();
 curl_setopt_array($curl, array(  
   //CURLOPT_URL => API_URL."email_campaign?status=sending",
@@ -55,6 +57,12 @@ else
   if( count($data) >= SIMULTANEOUS && $data->message == '')
 	  die('Sending still in progress ('.count($data).') exiting...');
 }
+*/
+
+//exec("ps aux | grep php", $process);
+//$process = count($process) - 3;
+//if($process >= SIMULTANEOUS)
+//	die('Sending still in progress ('.$process.') exiting...');
 
 
 //get ready status
@@ -81,7 +89,7 @@ if ($err) {
   echo "cURL Error #:" . $err;
 } else {
   $data = json_decode($response);
-
+  
   if(!isset($data->status)) {
 
     if(count($data) > 0) {
@@ -126,11 +134,25 @@ if ($err) {
 		$emails = $list_emails;
 		
 		//print_r($data);
-		//echo "per slot email : ".($email_per_slot)."<br>\n";
-		//echo "count server : ".($current_slot)."<br>\n";
-		//echo "count email : ".count($slot)."<br>\n";
-		//echo "start line : ".$start_line."<br>\n";
-		//echo "stop line : ".$stop_line."<br>\n";
+		echo "per slot email : ".($email_per_slot)."<br>\n";
+		echo "count server still on sending : ".($current_slot)."<br>\n";
+		echo "count email account will use : ".count($slot)."<br>\n";
+		echo "start line : ".$start_line."<br>\n";
+		echo "stop line : ".$stop_line."<br>\n";
+		
+		//get email account details
+		$email_account_data = explode("|", $slot[$current_slot]);
+		$data->ema_account = $email_account_data[0];
+		$data->ema_password = $email_account_data[1];
+		$data->ema_smtp_addr = $email_account_data[2];
+		$data->ema_smtp_port = $email_account_data[3];
+		$data->ema_imap_addr = $email_account_data[4];
+		$data->ema_imap_port = $email_account_data[5];
+		$data->ema_pop3_addr = $email_account_data[6];
+		$data->ema_pop3_port = $email_account_data[7];
+		
+		if($data->ema_account == '' || $data->ema_password == '')
+			die('Error when using email account and password.. its empty');
 
     	$curl = curl_init();
 		
@@ -207,155 +229,120 @@ if ($err) {
 
 		foreach($emails as $email) {
 		
-		//default value without rotation
-	    $sender_name = $data->sender_name;
-		$email_subject = $data->emc_email_subject;
-		
-		if($sending % $data->rotate == 0 && $data->rotate != 0){			
+			//default value without rotation
+			$sender_name = $data->sender_name;
+			$email_subject = $data->emc_email_subject;
 			
-			$rotate_email_body = str_replace( '[telephone]', $rotate_telephone[$rotate_number_telephone], $data->emc_email_body);
-			$rotate_email_body = str_replace( '[email]', $rotate_email[$rotate_number_email], $rotate_email_body);
-			$rotate_email_body = str_replace( '[site-internet]', $rotate_site_internet[$rotate_number_site_internet], $rotate_email_body);
-			$rotate_email_body = str_replace( '[text-repondre]', $rotate_text_repondre[$rotate_number_text_repondre], $rotate_email_body);
-			$email_subject = $rotate_email_subject[$rotate_number_email_subject];
-			$sender_name = $rotate_sender_name[$rotate_number_sender_name];
-			//echo $rotate_email_body."<hr><br><br>";
-		    
-			$rotate_number_telephone++;
-         	$rotate_number_email++;
-	        $rotate_number_site_internet++;
-	        $rotate_number_text_repondre++;
-			$rotate_number_email_subject++;
-			$rotate_number_sender_name++;
+			if($sending % $data->rotate == 0 && $data->rotate != 0){			
+				
+				$rotate_email_body = str_replace( '[telephone]', $rotate_telephone[$rotate_number_telephone], $data->emc_email_body);
+				$rotate_email_body = str_replace( '[email]', $rotate_email[$rotate_number_email], $rotate_email_body);
+				$rotate_email_body = str_replace( '[site-internet]', $rotate_site_internet[$rotate_number_site_internet], $rotate_email_body);
+				$rotate_email_body = str_replace( '[text-repondre]', $rotate_text_repondre[$rotate_number_text_repondre], $rotate_email_body);
+				$email_subject = $rotate_email_subject[$rotate_number_email_subject];
+				$sender_name = $rotate_sender_name[$rotate_number_sender_name];
+				//echo $rotate_email_body."<hr><br><br>";
+				
+				$rotate_number_telephone++;
+				$rotate_number_email++;
+				$rotate_number_site_internet++;
+				$rotate_number_text_repondre++;
+				$rotate_number_email_subject++;
+				$rotate_number_sender_name++;
+				
+				//reset rotate number if exceed than number of array count
+				if($rotate_number_telephone == count($rotate_telephone)) $rotate_number_telephone = 0;
+				if($rotate_number_email == count($rotate_email)) $rotate_number_email = 0;
+				if($rotate_number_site_internet == count($rotate_site_internet)) $rotate_number_site_internet = 0;
+				if($rotate_number_text_repondre == count($rotate_text_repondre)) $rotate_number_text_repondre = 0;
+				if($rotate_number_email_subject == count($rotate_email_subject)) $rotate_number_email_subject = 0;
+				if($rotate_number_sender_name == count($rotate_sender_name)) $rotate_number_sender_name = 0;
+				
+			}
+			$sending++;
+				
+			try {        
+				$mail->setFrom($data->ema_account, $sender_name);	
+				$mail->ClearAllRecipients();
+				$mail->addAddress($email);       // Name is optional
+				$mail->addReplyTo($data->ema_account);
+				
+				//Content
+				$mail->isHTML(true);
+				//$mail->Subject = $data->emc_email_subject;
+				$mail->Subject = $email_subject;
+				
+				//no rotation message
+				if($rotate_email_body == ''){
+					$rotate_email_body = $data->emc_email_body;			   
+				}
+				
+				//if type is text then convert new line into <br> tag
+				if($data->type == "text"){
+					$rotate_email_body = nl2br($rotate_email_body);
+				}
+				
+				$mail->Body    = $rotate_email_body;
+				$mail->AltBody = strip_tags($rotate_email_body);
+							
+				$mail->XMailer = 'Microsoft Office Outlook 12.0';
+
+				$mail->send();
+				echo 'Message has been sent to '.$email.'<br>';
+				$total_success_sent += 1;      
+
+				//count processing and sent
+				$curl = curl_init();
+				curl_setopt_array($curl, array(  
+				  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=success_sent',
+				  CURLOPT_RETURNTRANSFER => true,
+				  CURLOPT_ENCODING => "",
+				  CURLOPT_MAXREDIRS => 10,
+				  CURLOPT_TIMEOUT => 10,
+				  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				  CURLOPT_CUSTOMREQUEST => "GET",
+				  CURLOPT_HTTPHEADER => array(    
+					"x-api-key: ".API_KEY
+				  ),
+				));
+
+				$response = curl_exec($curl);
+				$err = curl_error($curl);
+				curl_close($curl);
+				
+			} catch (Exception $e) {
+				echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+				
+				//count processing
+				$curl = curl_init();
+				curl_setopt_array($curl, array(  
+				  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=fail_sent',
+				  CURLOPT_RETURNTRANSFER => true,
+				  CURLOPT_ENCODING => "",
+				  CURLOPT_MAXREDIRS => 10,
+				  CURLOPT_TIMEOUT => 10,
+				  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				  CURLOPT_CUSTOMREQUEST => "GET",
+				  CURLOPT_HTTPHEADER => array(    
+					"x-api-key: ".API_KEY
+				  ),
+				));
+
+				$response = curl_exec($curl);
+				$err = curl_error($curl);
+				curl_close($curl);			
+			}
+
+			$total_sent += 1;
+			sleep($delay);
 			
-			//reset rotate number if exceed than number of array count
-			if($rotate_number_telephone == count($rotate_telephone)) $rotate_number_telephone = 0;
-			if($rotate_number_email == count($rotate_email)) $rotate_number_email = 0;
-			if($rotate_number_site_internet == count($rotate_site_internet)) $rotate_number_site_internet = 0;
-			if($rotate_number_text_repondre == count($rotate_text_repondre)) $rotate_number_text_repondre = 0;
-			if($rotate_number_email_subject == count($rotate_email_subject)) $rotate_number_email_subject = 0;
-			if($rotate_number_sender_name == count($rotate_sender_name)) $rotate_number_sender_name = 0;
-			
+			flush();
+			ob_flush();
+	
 		}
-		$sending++;
-			
-        try {        
-            //Recipients
-			//$sender_friendly_name = preg_split('/[@.]/', $data->ema_account);						
-            //$mail->setFrom($data->ema_account, ucwords($sender_friendly_name[0]), ' ', ucwords($sender_friendly_name[1]));
-			//$mail->setFrom($data->ema_account, "Macom de mairie");
-			
-			//Change to rotate sender name
-			//$mail->setFrom($data->ema_account, $data->emc_sender_name);
-			$mail->setFrom($data->ema_account, $sender_name);
-			
-			$mail->ClearAllRecipients();
-            $mail->addAddress($email);       // Name is optional
-            $mail->addReplyTo($data->ema_account);
-            
-            //Content
-            $mail->isHTML(true);
-            //$mail->Subject = $data->emc_email_subject;
-			$mail->Subject = $email_subject;
-            
-			//no rotation message
-			if($rotate_email_body == ''){
-				$rotate_email_body = $data->emc_email_body;			   
-			}
-			
-			//if type is text then convert new line into <br> tag
-			if($data->type == "text"){
-				$rotate_email_body = nl2br($rotate_email_body);
-			}
-			
-            $mail->Body    = $rotate_email_body;
-			$mail->AltBody = strip_tags($rotate_email_body);
-			            
-            $mail->XMailer = 'Microsoft Office Outlook 12.0';
 
-            $mail->send();
-            echo 'Message has been sent to '.$email.'<br>';
-            $total_success_sent += 1;      
-
-			//count processing and sent
-			$curl = curl_init();
-			curl_setopt_array($curl, array(  
-			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=success_sent',
-			  CURLOPT_RETURNTRANSFER => true,
-			  CURLOPT_ENCODING => "",
-			  CURLOPT_MAXREDIRS => 10,
-			  CURLOPT_TIMEOUT => 10,
-			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			  CURLOPT_CUSTOMREQUEST => "GET",
-			  CURLOPT_HTTPHEADER => array(    
-				"x-api-key: ".API_KEY
-			  ),
-			));
-
-			$response = curl_exec($curl);
-			$err = curl_error($curl);
-			curl_close($curl);
-			
-        } catch (Exception $e) {
-            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
-			
-			//count processing
-			$curl = curl_init();
-			curl_setopt_array($curl, array(  
-			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id.'?action=fail_sent',
-			  CURLOPT_RETURNTRANSFER => true,
-			  CURLOPT_ENCODING => "",
-			  CURLOPT_MAXREDIRS => 10,
-			  CURLOPT_TIMEOUT => 10,
-			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			  CURLOPT_CUSTOMREQUEST => "GET",
-			  CURLOPT_HTTPHEADER => array(    
-				"x-api-key: ".API_KEY
-			  ),
-			));
-
-			$response = curl_exec($curl);
-			$err = curl_error($curl);
-			curl_close($curl);			
-        }
-
-        $total_sent += 1;
-        sleep($delay);
-		
-		flush();
-		ob_flush();
-		
-		//update the progress
-		/*
-		$fields = array(
-          'emc_num_email_sent' => $total_sent
-        );  
-        $fields_string = http_build_query($fields);
-
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 10,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "PUT",
-          CURLOPT_POSTFIELDS => $fields_string,
-          CURLOPT_HTTPHEADER => array(      
-            "content-type: application/x-www-form-urlencoded",
-            "x-api-key: ".API_KEY
-          ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-		*/
-      }
-
-      //set status to completed
-      if($total_sent == count($emails)) {
+		//set status to completed
+		if($total_sent == count($emails)) {
 		  
 		//deleting send.lock
 		//it will release cron to call this script again

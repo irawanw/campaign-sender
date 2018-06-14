@@ -85,6 +85,34 @@ if ($err) {
 	if(is_array($email_data)){
 		
 		foreach($email_data as $bounce_data){		
+		
+			$slot = preg_split("#,#", $bounce_data->emc_email_account);
+			$servers = explode("|", $bounce_data->emc_server_sending);		
+			
+			//remove empty array
+			$slot = array_filter($slot);
+			$servers = array_filter($servers);
+			
+			$i = 0;
+			foreach($servers as $server)
+			{
+				if($server == SERVER_IP)
+					$email_account_data = $slot[$i];
+				$i++;
+			}
+			//get email account details
+			$email_account_data = explode("|", $email_account_data);
+			$bounce_data->ema_account = $email_account_data[0];
+			$bounce_data->ema_password = $email_account_data[1];
+			$bounce_data->ema_smtp_addr = $email_account_data[2];
+			$bounce_data->ema_smtp_port = $email_account_data[3];
+			$bounce_data->ema_imap_addr = $email_account_data[4];
+			$bounce_data->ema_imap_port = $email_account_data[5];
+			$bounce_data->ema_pop3_addr = $email_account_data[6];
+			$bounce_data->ema_pop3_port = $email_account_data[7];
+			
+			if($bounce_data->ema_account == '' || $bounce_data->ema_password == '')
+				die('Error when using email account and password.. its empty');
 			
 			$mail_addr = $bounce_data->ema_account;
 			$mail_pass = $bounce_data->ema_password;
