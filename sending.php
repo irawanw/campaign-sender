@@ -171,6 +171,7 @@ if ($err) {
 			$fields_string = http_build_query($fields);
 
 			//set status to sending
+			$curl = curl_init();
 			curl_setopt_array($curl, array(
 			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
 			  CURLOPT_RETURNTRANSFER => true,
