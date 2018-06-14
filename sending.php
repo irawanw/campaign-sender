@@ -59,10 +59,10 @@ else
 }
 */
 
-//exec("ps aux | grep php", $process);
-//$process = count($process) - 3;
-//if($process >= SIMULTANEOUS)
-//	die('Sending still in progress ('.$process.') exiting...');
+exec("ps aux | grep php", $process);
+$process = count($process) - 3;
+if($process >= SIMULTANEOUS)
+	die('Sending still in progress ('.$process.') exiting...');
 
 
 //get ready status
