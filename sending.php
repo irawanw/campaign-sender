@@ -219,16 +219,16 @@ if ($err) {
 
 		$sending = 0;
 		$rotate_number_telephone = 0;
-		//$rotate_number_telephone_2 = 0;
-		//$rotate_number_fixed_telephone = 0;
+		$rotate_number_telephone_2 = 0;
+		$rotate_number_fixed_telephone = 0;
 		$rotate_number_email = 0;
 		$rotate_number_site_internet = 0;
 		$rotate_number_text_repondre = 0;
 		$rotate_number_email_subject = 0;
 		$rotate_number_sender_name = 0;
-		//$rotate_number_unsubscribe_text = 0;
-		//$rotate_number_number_change = 0;
-		//$rotate_number_dont_reply = 0;
+		$rotate_number_unsubscribe_text = 0;
+		$rotate_number_number_change = 0;
+		$rotate_number_dont_reply = 0;
 		$rotate_email_body = '';
 
 		foreach($emails as $index=>$email) {
@@ -240,42 +240,42 @@ if ($err) {
 			if($sending % $data->rotate == 0 && $data->rotate != 0){			
 				
 				$rotate_email_body = str_replace( '[telephone]', $rotate_telephone[$rotate_number_telephone], $data->emc_email_body);
-				//$rotate_email_body = str_replace( '[telephone-2]', $rotate_telephone_2[$rotate_number_telephone_2], $rotate_email_body);
-				//$rotate_email_body = str_replace( '[fixed-telephone]', $rotate_fixed_telephone[$rotate_number_fixed_telephone], $rotate_email_body);
+				$rotate_email_body = str_replace( '[telephone-2]', $rotate_telephone_2[$rotate_number_telephone_2], $rotate_email_body);
+				$rotate_email_body = str_replace( '[fixed-telephone]', $rotate_fixed_telephone[$rotate_number_fixed_telephone], $rotate_email_body);
 				$rotate_email_body = str_replace( '[email]', $rotate_email[$rotate_number_email], $rotate_email_body);
 				$rotate_email_body = str_replace( '[site-internet]', $rotate_site_internet[$rotate_number_site_internet], $rotate_email_body);
 				$rotate_email_body = str_replace( '[text-repondre]', $rotate_text_repondre[$rotate_number_text_repondre], $rotate_email_body);
-				//$rotate_email_body = str_replace( '[unsubscribe-text]', $rotate_unsubscribe_text[$rotate_number_unsubscribe_text], $rotate_email_body);
-				//$rotate_email_body = str_replace( '[text-number-change]', $rotate_number_change[$rotate_number_number_change], $rotate_email_body);
-				//$rotate_email_body = str_replace( '[text-dont-reply]', $rotate_dont_reply[$rotate_number_dont_reply], $rotate_email_body);
+				$rotate_email_body = str_replace( '[unsubscribe-text]', $rotate_unsubscribe_text[$rotate_number_unsubscribe_text], $rotate_email_body);
+				$rotate_email_body = str_replace( '[text-number-change]', $rotate_number_change[$rotate_number_number_change], $rotate_email_body);
+				$rotate_email_body = str_replace( '[text-dont-reply]', $rotate_dont_reply[$rotate_number_dont_reply], $rotate_email_body);
 				$email_subject = $rotate_email_subject[$rotate_number_email_subject];
 				$sender_name = $rotate_sender_name[$rotate_number_sender_name];
 				//echo $rotate_email_body."<hr><br><br>";
 				
 				$rotate_number_telephone++;
-				//$rotate_number_telephone_2++;
-				//$rotate_number_fixed_telephone++;
+				$rotate_number_telephone_2++;
+				$rotate_number_fixed_telephone++;
 				$rotate_number_email++;
 				$rotate_number_site_internet++;
 				$rotate_number_text_repondre++;
 				$rotate_number_email_subject++;
 				$rotate_number_sender_name++;
-				//$rotate_number_unsubscribe_text++;
-				//$rotate_number_number_change++;
-				//$rotate_number_dont_reply++;
+				$rotate_number_unsubscribe_text++;
+				$rotate_number_number_change++;
+				$rotate_number_dont_reply++;
 				
 				//reset rotate number if exceed than number of array count
 				if($rotate_number_telephone == count($rotate_telephone)) $rotate_number_telephone = 0;
-				//if($rotate_number_telephone_2 == count($rotate_telephone_2)) $rotate_number_telephone_2 = 0;
-				//if($rotate_number_fixed_telephone == count($rotate_fixed_telephone)) $rotate_number_fixed_telephone = 0;
+				if($rotate_number_telephone_2 == count($rotate_telephone_2)) $rotate_number_telephone_2 = 0;
+				if($rotate_number_fixed_telephone == count($rotate_fixed_telephone)) $rotate_number_fixed_telephone = 0;
 				if($rotate_number_email == count($rotate_email)) $rotate_number_email = 0;
 				if($rotate_number_site_internet == count($rotate_site_internet)) $rotate_number_site_internet = 0;
 				if($rotate_number_text_repondre == count($rotate_text_repondre)) $rotate_number_text_repondre = 0;
 				if($rotate_number_email_subject == count($rotate_email_subject)) $rotate_number_email_subject = 0;
 				if($rotate_number_sender_name == count($rotate_sender_name)) $rotate_number_sender_name = 0;
-				//if($rotate_number_unsubscribe_text == count($rotate_unsubscribe_text)) $rotate_number_unsubscribe_text = 0;
-				//if($rotate_number_number_change == count($rotate_number_change)) $rotate_number_number_change = 0;
-				//if($rotate_number_dont_reply == count($rotate_dont_reply)) $rotate_number_dont_reply = 0;				
+				if($rotate_number_unsubscribe_text == count($rotate_unsubscribe_text)) $rotate_number_unsubscribe_text = 0;
+				if($rotate_number_number_change == count($rotate_number_change)) $rotate_number_number_change = 0;
+				if($rotate_number_dont_reply == count($rotate_dont_reply)) $rotate_number_dont_reply = 0;				
 								
 			}
 			$sending++;
