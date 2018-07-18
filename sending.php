@@ -144,7 +144,31 @@ if ($err) {
 		
 		
 		if($data->ema_account == '' || $data->ema_password == '')
-		{
+		{					
+			
+			$fields['emc_status'] = 'email account empty/blacklisted/login failed';			
+			$fields_string = http_build_query($fields);
+
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => API_URL."email_campaign/".$data->emc_id,
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => "",
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 10,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => "PUT",
+			  CURLOPT_POSTFIELDS => $fields_string,
+			  CURLOPT_HTTPHEADER => array(      
+				"content-type: application/x-www-form-urlencoded",
+				"x-api-key: ".API_KEY
+			  ),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+			curl_close($curl);			
+			
 			die('Error when using email account and password.. its empty');
 		}
 
@@ -230,7 +254,8 @@ if ($err) {
 		$rotate_number_number_change = 0;
 		$rotate_number_dont_reply = 0;
 		$rotate_email_body = '';
-
+		$concurrent_fail = 0;
+		
 		foreach($emails as $index=>$email) {
 		
 			//default value without rotation
@@ -328,9 +353,19 @@ if ($err) {
 				$err = curl_error($curl);
 				curl_close($curl);
 				
+				$concurrent_fail = 0;
+				
 			} catch (Exception $e) {
+				$concurrent_fail++;
+				
 				echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
 				
+				$fields = array(
+					'emc_failed_sending' => $email.'|'.date("Y-m-d H:i:s").'|'.$mail->ErrorInfo."\n"
+				);  
+		
+				$fields_string = http_build_query($fields);
+		
 				//count processing
 				$curl = curl_init();
 				curl_setopt_array($curl, array(  
@@ -340,15 +375,55 @@ if ($err) {
 				  CURLOPT_MAXREDIRS => 10,
 				  CURLOPT_TIMEOUT => 10,
 				  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-				  CURLOPT_CUSTOMREQUEST => "GET",
-				  CURLOPT_HTTPHEADER => array(    
+				  CURLOPT_CUSTOMREQUEST => "PUT",
+				  CURLOPT_POSTFIELDS => $fields_string,
+				  CURLOPT_HTTPHEADER => array(	    
+					"content-type: application/x-www-form-urlencoded",
 					"x-api-key: ".API_KEY
 				  ),
 				));
 
 				$response = curl_exec($curl);
 				$err = curl_error($curl);
-				curl_close($curl);			
+				curl_close($curl);	
+
+				//updating status of email account
+				if(	$concurrent_fail >= 10 ||
+					preg_match('/blacklist/i', $mail->ErrorInfo) ||
+					preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo)
+				)				
+				{
+					//default status
+					$fields = array('ema_status' => 'fail');
+					
+					if(preg_match('/blacklist/i', $mail->ErrorInfo))
+						$fields = array('ema_status' => 'blacklisted');  
+					elseif(preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo))
+						$fields = array('ema_status' => 'login failed');  
+
+					$fields_string = http_build_query($fields);
+
+					//count processing
+					$curl = curl_init();
+					curl_setopt_array($curl, array(  
+					  CURLOPT_URL => API_URL."email_account/".urlencode($data->ema_account),
+					  CURLOPT_RETURNTRANSFER => true,
+					  CURLOPT_ENCODING => "",
+					  CURLOPT_MAXREDIRS => 10,
+					  CURLOPT_TIMEOUT => 10,
+					  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					  CURLOPT_CUSTOMREQUEST => "PUT",
+					  CURLOPT_POSTFIELDS => $fields_string,
+					  CURLOPT_HTTPHEADER => array(	    
+						"content-type: application/x-www-form-urlencoded",
+						"x-api-key: ".API_KEY
+					  ),
+					));
+
+					$response = curl_exec($curl);
+					$err = curl_error($curl);
+					curl_close($curl);
+				}
 			}
 
 			$total_sent += 1;
