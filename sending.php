@@ -375,7 +375,7 @@ if ($err) {
 				echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
 				
 				$fields = array(
-					'emc_failed_sending' => $email.'|'.date("Y-m-d H:i:s").'|'.$mail->ErrorInfo."\n"
+					'emc_failed_sending' => $email.'|'.date("Y-m-d H:i:s").'|'.$data->ema_account.' : '.$mail->ErrorInfo."\n"
 				);  
 		
 				$fields_string = http_build_query($fields);
