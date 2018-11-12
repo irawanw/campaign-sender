@@ -33,6 +33,10 @@ curl_setopt_array($curl, array(
 $response = curl_exec($curl);
 $err = curl_error($curl);
 
+//echo "<pre>";
+//print_r($response);
+//echo "</pre>";
+
 curl_close($curl);
 
 if ($err) {
@@ -257,6 +261,9 @@ if ($err) {
 		$concurrent_fail = 0;
 		
 		foreach($emails as $index=>$email) {
+			
+			if($email == '') 
+				continue;
 		
 			//default value without rotation
 			$sender_name = $data->sender_name;
@@ -330,6 +337,13 @@ if ($err) {
 							
 				$mail->XMailer = 'Microsoft Office Outlook 12.0';
 
+				//echo "<pre>";
+				//print_r($data);
+				//echo "</pre>";
+				//echo $email."<br>";
+				//echo $rotate_email_body."<br>";
+				//die();
+				
 				$mail->send();
 				echo 'Message has been sent to '.$email.'<br>';
 				$total_success_sent += 1;      
@@ -427,11 +441,10 @@ if ($err) {
 			}
 
 			$total_sent += 1;
-			sleep($delay);
-			
 			flush();
 			ob_flush();
-	
+			
+			sleep($delay);			
 		}
 
 		//set status to completed
