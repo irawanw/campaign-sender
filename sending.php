@@ -434,8 +434,8 @@ if ($err) {
 
             //updating status of email account
             if(	$concurrent_fail >= 10 ||
-              preg_match('/blacklist/i', $mail->ErrorInfo) ||
-              preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo)
+              preg_match('/blacklist/i', $mail->ErrorInfo) 
+              //|| preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo)
             )				
             {
               //default status
