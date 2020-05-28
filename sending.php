@@ -440,8 +440,8 @@ if ($err) {
               
               if(preg_match('/blacklist/i', $mail->ErrorInfo))
                 $fields = array('ema_status' => 'blacklisted');  
-              elseif(preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo))
-                $fields = array('ema_status' => 'login failed');  
+              //elseif(preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo))
+              //  $fields = array('ema_status' => 'login failed');  
 
               $fields_string = http_build_query($fields);
 
