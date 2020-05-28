@@ -250,8 +250,8 @@ if ($err) {
         $mail->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
         $mail->Username = $data->ema_account;                 // SMTP username
-        //$mail->Password = $data->ema_password;                // SMTP password
-        $mail->Password = 'qF3FC$skuQ2B5d';
+        $mail->Password = $data->ema_password;                // SMTP password
+        //$mail->Password = 'qF3FC$skuQ2B5d';
         $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = $data->ema_smtp_port; 
 
