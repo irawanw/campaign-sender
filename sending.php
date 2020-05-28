@@ -9,6 +9,7 @@ Eden\Core\Control::i();
 //flusing output
 flush();
 ob_flush();
+set_time_limit(0);
 
 exec("ps aux | grep php", $process);
 $process = count($process) - 3;
@@ -237,10 +238,11 @@ if ($err) {
 
         $mail->SMTPDebug = 2;                                 // Enable verbose debug output
         $mail->isSMTP();                                      // Set mailer to use SMTP
-        $mail->Host = $data->ema_smtp_addr;  // Specify main and backup SMTP servers
+        $mail->Timeout = 60;
+        $mail->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
         $mail->Username = $data->ema_account;                 // SMTP username
-        $mail->Password = $data->ema_password;                           // SMTP password
+        $mail->Password = $data->ema_password;                // SMTP password
         $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = $data->ema_smtp_port; 
 
