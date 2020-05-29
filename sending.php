@@ -58,7 +58,7 @@ if ($err) {
       $slot = preg_split("#,#", $data->emc_email_account);
       $emails = explode("\n", $data->emc_email_target);
       $servers = explode("|", $data->emc_server_sending);		
-      $email_per_slot = ceil(count($emails)/count($slot));
+      $email_per_slot = ceil(count($emails)/NUMBER_SERVER);
       
       //remove empty array
       $slot = array_filter($slot);
@@ -89,14 +89,16 @@ if ($err) {
       }
       
       //change emails variable using list emails
+      $master_email_accounts = $slot;
+      $email_accounts = $slot;
       $emails = $list_emails;
       
       //print_r($data);
-      echo "per slot email : ".($email_per_slot)."<br>\n";
-      echo "count server still on sending : ".($current_slot)."<br>\n";
-      echo "count email account will use : ".count($slot)."<br>\n";
-      echo "start line : ".$start_line."<br>\n";
-      echo "stop line : ".$stop_line."<br>\n";
+      echo "per slot email : ".($email_per_slot)."\n";
+      echo "count server still on sending : ".($current_slot)."\n";
+      echo "count email account will use : ".count($slot)."\n";
+      echo "start line : ".$start_line."\n";
+      echo "stop line : ".$stop_line."\n";
       
       //get email account details
       $email_account_data = explode("|", $slot[$current_slot]);
@@ -121,9 +123,9 @@ if ($err) {
       if(count($slot) < count($servers)+1)
       {
         if($servers == '')
-          $update_servers = SERVER_IP;
+            $update_servers = SERVER_IP;
         else
-          $update_servers = trim(implode("\n", $servers))."\n".SERVER_IP;
+            $update_servers = trim(implode("\n", $servers))."\n".SERVER_IP;
         
         $fields = array(
           'emc_status' => 'completed',		  
@@ -159,7 +161,7 @@ if ($err) {
       //print_r($data);
       //echo "</pre>";
 		
-      echo "checking ema_account<br>\n";
+      echo "checking ema_account\n";
       if($data->ema_account == '' || $data->ema_password == '')
       {					
         
@@ -186,7 +188,7 @@ if ($err) {
         $err = curl_error($curl);
         curl_close($curl);			
         
-        echo "Error when using email account and password.. (empty)<br>\n";
+        echo "Error when using email account and password.. (empty)\n";
         //die();
         
       }
@@ -246,15 +248,8 @@ if ($err) {
         
         $mail->SMTPDebug = 2;                                 // Enable verbose debug output
         $mail->isSMTP();                                      // Set mailer to use SMTP
-        $mail->Timeout = 60;
-        $mail->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
-        $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = $data->ema_account;                 // SMTP username
-        $mail->Password = $data->ema_password;                // SMTP password
-        //$mail->Password = 'qF3FC$skuQ2B5d';
+        $mail->SMTPAuth = true;  
         $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
-        $mail->Port = $data->ema_smtp_port; 
-
 
         $delay = (int)$data->emc_delay;
         $total_sent = 0;
@@ -287,18 +282,18 @@ if ($err) {
         $rotate_email_body = '';
         $concurrent_fail = 0;
         
-        echo "loop sending to all recipient<br>\n";
-        echo "<pre>";
-        print_r($email);
-        echo "</pre>";
+        echo "loop sending to all recipient\n";
+        //echo "<pre>";
+        //print_r($email);
+        //echo "</pre>";
         
         foreach($emails as $index=>$email) 
         {
           
           if($email == '') 
           {
-            echo "empty recipient..next loop<br>\n";
-            continue;
+              echo "empty recipient..next loop\n";
+              continue;
           }
         
           //default value without rotation
@@ -350,7 +345,24 @@ if ($err) {
           }
           $sending++;
             
-          try {        
+          try 
+          {        
+            //pickup random email account
+            //random will use round robin algorithm
+            //with checking login before send
+            //if login failed
+            //then it will be kicked from the array
+            if(count($email_accounts) == 0)
+            {
+                $email_accounts = $master_email_accounts;
+            }
+          
+            randomize_email_account();
+          
+            $mail->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
+            $mail->Username = $data->ema_account;                 // SMTP username
+            $mail->Password = $data->ema_password;                // SMTP password
+            $mail->Port = $data->ema_smtp_port; 
             $mail->setFrom($data->ema_account, $sender_name);	
             $mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
@@ -382,9 +394,9 @@ if ($err) {
             //echo $rotate_email_body."<br>";
             //die();
             
-            echo 'Sending to '.$email."<br>\n";
+            echo 'Sending to '.$email."\n";
             $mail->send();
-            echo 'Message has been sent to '.$email."<br>\n";
+            echo 'Message has been sent to '.$email."\n";
             $total_success_sent += 1;      
 
             //count processing and sent
@@ -450,7 +462,7 @@ if ($err) {
               $fields = array('ema_status' => 'fail');
               
               if(preg_match('/blacklist/i', $mail->ErrorInfo))
-                $fields = array('ema_status' => 'blacklisted');  
+                  $fields = array('ema_status' => 'blacklisted');  
               //elseif(preg_match('/smtp connect\(\) failed/i', $mail->ErrorInfo))
               //  $fields = array('ema_status' => 'login failed');  
 
@@ -487,7 +499,7 @@ if ($err) {
           
         }
 
-        echo "end of loop sending mail<br>\n";
+        echo "end of loop sending mail\n";
         
         //set status to completed
         if($total_sent == count($emails)) {
@@ -534,5 +546,77 @@ if ($err) {
   } else {
   	echo $data->message."\n";
   }
+}
+
+function randomize_email_account()
+{
+    global $master_email_accounts;
+    global $email_accounts;
+    global $data;
+    
+    $random = array_rand($email_accounts);
+    $email_account_data = explode("|", $email_accounts[$random]);
+    $data->ema_account = $email_account_data[0];
+    $data->ema_password = $email_account_data[1];
+    $data->ema_smtp_addr = $email_account_data[2];
+    $data->ema_smtp_port = $email_account_data[3];
+    $data->ema_imap_addr = $email_account_data[4];
+    $data->ema_imap_port = $email_account_data[5];
+    $data->ema_pop3_addr = $email_account_data[6];
+    $data->ema_pop3_port = $email_account_data[7];
+    
+    //echo $random;
+    //echo "<pre>";
+    //print_r($email_account_data);
+    //echo "</pre>";
+    
+    if( $data->ema_account == '' ||
+        $data->ema_password == '' ||
+        $data->ema_smtp_addr == '' ||
+        $data->ema_smtp_port == '' ||
+        $data->ema_imap_addr == '' ||
+        $data->ema_pop3_port == '')
+    {
+        unset($master_email_accounts[$random]);
+        unset($email_accounts[$random]);
+        randomize_email_account();
+    }
+    
+    $mail_check = new PHPMailer(true);
+    $mail_check->CharSet = 'UTF-8';  
+
+    $mail_check->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
+    
+    $mail_check->SMTPDebug = 0;                                 // Enable verbose debug output
+    $mail_check->isSMTP();                                      // Set mailer to use SMTP
+    $mail_check->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail_check->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
+    $mail_check->Username = $data->ema_account;                 // SMTP username
+    $mail_check->Password = $data->ema_password;
+    $mail_check->Port = $data->ema_smtp_port; 
+    $mail_check->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+
+    try 
+    {
+        $valid = $mail_check->SmtpConnect();
+        if($valid)
+            echo $data->ema_account." login is valid\n";
+        
+        $mail_check->SmtpClose();
+        unset($email_accounts[$random]);
+    }
+    catch(Exception $error) 
+    { 
+        echo $data->ema_account." could not login probably domain is blacklisted?\n";
+        unset($master_email_accounts[$random]);
+        unset($email_accounts[$random]);
+        randomize_email_account();
+    }
 }
 ?>
