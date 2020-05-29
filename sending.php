@@ -11,6 +11,9 @@ flush();
 ob_flush();
 set_time_limit(0);
 
+//quick variable
+$number_slot = 8;
+
 exec("ps aux | grep php", $process);
 $process = count($process) - 3;
 if($process >= SIMULTANEOUS)
@@ -58,7 +61,7 @@ if ($err) {
       $slot = preg_split("#,#", $data->emc_email_account);
       $emails = explode("\n", $data->emc_email_target);
       $servers = explode("|", $data->emc_server_sending);		
-      $email_per_slot = ceil(count($emails)/NUMBER_SERVER);
+      $email_per_slot = ceil(count($emails)/$number_slot);
       
       //remove empty array
       $slot = array_filter($slot);
