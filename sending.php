@@ -13,10 +13,11 @@ set_time_limit(0);
 
 //quick variable
 $number_slot = 8;
+$simultaneous = 1;
 
 exec("ps aux | grep php", $process);
 $process = count($process) - 3;
-if($process >= SIMULTANEOUS)
+if($process >= $simultaneous)
 	die('Sending still in progress ('.$process.') exiting...');
 
 //get ready status
@@ -368,6 +369,7 @@ if ($err) {
             $mail->Port = $data->ema_smtp_port; 
             $mail->setFrom($data->ema_account, $sender_name);	
             $mail->ClearAllRecipients();
+            $this->clearReplyTos();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
