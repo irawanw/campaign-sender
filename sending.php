@@ -105,15 +105,15 @@ if ($err) {
       echo "stop line : ".$stop_line."\n";
       
       //get email account details
-      //$email_account_data = explode("|", $slot[$current_slot]);
-      //$data->ema_account = $email_account_data[0];
-      //$data->ema_password = $email_account_data[1];
-      //$data->ema_smtp_addr = $email_account_data[2];
-      //$data->ema_smtp_port = $email_account_data[3];
-      //$data->ema_imap_addr = $email_account_data[4];
-      //$data->ema_imap_port = $email_account_data[5];
-      //$data->ema_pop3_addr = $email_account_data[6];
-      //$data->ema_pop3_port = $email_account_data[7];
+      $email_account_data = explode("|", $slot[$current_slot]);
+      $data->ema_account = $email_account_data[0];
+      $data->ema_password = $email_account_data[1];
+      $data->ema_smtp_addr = $email_account_data[2];
+      $data->ema_smtp_port = $email_account_data[3];
+      $data->ema_imap_addr = $email_account_data[4];
+      $data->ema_imap_port = $email_account_data[5];
+      $data->ema_pop3_addr = $email_account_data[6];
+      $data->ema_pop3_port = $email_account_data[7];
       
       //echo "<pre>";
       //echo $current_slot."<br>";
