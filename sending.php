@@ -105,15 +105,15 @@ if ($err) {
       echo "stop line : ".$stop_line."\n";
       
       //get email account details
-      $email_account_data = explode("|", $slot[$current_slot]);
-      $data->ema_account = $email_account_data[0];
-      $data->ema_password = $email_account_data[1];
-      $data->ema_smtp_addr = $email_account_data[2];
-      $data->ema_smtp_port = $email_account_data[3];
-      $data->ema_imap_addr = $email_account_data[4];
-      $data->ema_imap_port = $email_account_data[5];
-      $data->ema_pop3_addr = $email_account_data[6];
-      $data->ema_pop3_port = $email_account_data[7];
+      //$email_account_data = explode("|", $slot[$current_slot]);
+      //$data->ema_account = $email_account_data[0];
+      //$data->ema_password = $email_account_data[1];
+      //$data->ema_smtp_addr = $email_account_data[2];
+      //$data->ema_smtp_port = $email_account_data[3];
+      //$data->ema_imap_addr = $email_account_data[4];
+      //$data->ema_imap_port = $email_account_data[5];
+      //$data->ema_pop3_addr = $email_account_data[6];
+      //$data->ema_pop3_port = $email_account_data[7];
       
       //echo "<pre>";
       //echo $current_slot."<br>";
@@ -237,23 +237,6 @@ if ($err) {
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-          
-        //send mail
-        $mail = new PHPMailer(true);
-        $mail->CharSet = 'UTF-8';  
-        
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
-        
-        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-        $mail->isSMTP();                                      // Set mailer to use SMTP
-        $mail->SMTPAuth = true;  
-        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
 
         $delay = (int)$data->emc_delay;
         $total_sent = 0;
@@ -351,6 +334,21 @@ if ($err) {
             
           try 
           {        
+          
+            //check domain is exist for destination
+            //if not exist then we move to next recipient
+            $temp = explode('@', $email);
+            $domain = $temp[1];
+            if ( checkdnsrr($domain, 'ANY') ) 
+            {
+                echo $domain." DNS Record found\n";
+            }
+            else 
+            {
+                echo $domain." DNS Record not found, move to next\n";
+                continue;
+            }
+            
             //pickup random email account
             //random will use round robin algorithm
             //with checking login before send
@@ -363,13 +361,30 @@ if ($err) {
           
             randomize_email_account();
           
+            //send mail
+            $mail = new PHPMailer(true);
+            $mail->ClearAllRecipients();
+            $mail->clearReplyTos();
+            
+            $mail->CharSet = 'UTF-8';  
+            
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+            
+            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->SMTPAuth = true;  
+            $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
             $mail->Host = $data->ema_smtp_addr;                   // Specify main and backup SMTP servers
             $mail->Username = $data->ema_account;                 // SMTP username
             $mail->Password = $data->ema_password;                // SMTP password
             $mail->Port = $data->ema_smtp_port; 
             $mail->setFrom($data->ema_account, $sender_name);	
-            $mail->ClearAllRecipients();
-            $mail->clearReplyTos();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
@@ -399,7 +414,7 @@ if ($err) {
             //echo $rotate_email_body."<br>";
             //die();
             
-            echo 'Sending to '.$email."\n";
+            echo "\n\nSending frpm ".$data->ema_account" to ".$email."\n";
             $mail->send();
             echo 'Message has been sent to '.$email."\n";
             $total_success_sent += 1;      
@@ -428,7 +443,7 @@ if ($err) {
           } catch (Exception $e) {
             $concurrent_fail++;
             
-            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo."\n";
             
             $fields = array(
               'emc_failed_sending' => $email.'|'.date("Y-m-d H:i:s").'| '.SERVER_IP.' '.$data->ema_account.' : '.$mail->ErrorInfo."\n"
