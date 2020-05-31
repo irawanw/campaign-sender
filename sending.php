@@ -415,9 +415,9 @@ if ($err) {
             //echo $rotate_email_body."<br>";
             //die();
             
-            echo "\n\nSending from ".$data->ema_account." to ".$email."\n";
+            echo "Sending from ".$data->ema_account." to ".$email."\n";
             $mail->send();
-            echo 'Message has been sent to '.$email."\n";
+            echo 'Message has been sent to '.$email."\n\n";
             $total_success_sent += 1;      
 
             //count processing and sent
