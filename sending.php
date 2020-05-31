@@ -337,15 +337,16 @@ if ($err) {
           
             //check domain is exist for destination
             //if not exist then we move to next recipient
-            $temp = explode('@', $email);
-            $domain = $temp[1];
-            if ( checkdnsrr($domain, 'ANY') ) 
+            $temp_domain = preg_split('/\@/', $email);
+            $domain = trim($temp_domain[1]);
+            
+            if(filter_var(gethostbyname($domain), FILTER_VALIDATE_IP))
             {
-                echo $domain." DNS Record found\n";
+                echo gethostbyname($domain)." valid domain\n";
             }
-            else 
+            else
             {
-                echo $domain." DNS Record not found, move to next\n";
+                echo $domain." not valid domain!\n";
                 continue;
             }
             
@@ -385,7 +386,7 @@ if ($err) {
             $mail->Password = $data->ema_password;                // SMTP password
             $mail->Port = $data->ema_smtp_port; 
             $mail->setFrom($data->ema_account, $sender_name);	
-            $mail->addAddress($email);       // Name is optional
+            $mail->addAddress(trim($email));       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
             //Content
