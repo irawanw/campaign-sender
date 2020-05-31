@@ -635,6 +635,8 @@ function randomize_email_account()
     catch(Exception $error) 
     { 
         echo $data->ema_account." could not login probably domain is blacklisted?\n";
+        $mail_check->SmtpClose();
+        
         unset($master_email_accounts[$random]);
         unset($email_accounts[$random]);
         randomize_email_account();
