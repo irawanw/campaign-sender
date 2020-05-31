@@ -414,7 +414,7 @@ if ($err) {
             //echo $rotate_email_body."<br>";
             //die();
             
-            echo "\n\nSending frpm ".$data->ema_account" to ".$email."\n";
+            echo "\n\nSending from ".$data->ema_account." to ".$email."\n";
             $mail->send();
             echo 'Message has been sent to '.$email."\n";
             $total_success_sent += 1;      
