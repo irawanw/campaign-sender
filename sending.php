@@ -369,7 +369,7 @@ if ($err) {
             $mail->Port = $data->ema_smtp_port; 
             $mail->setFrom($data->ema_account, $sender_name);	
             $mail->ClearAllRecipients();
-            $this->clearReplyTos();
+            $mail->clearReplyTos();
             $mail->addAddress($email);       // Name is optional
             $mail->addReplyTo($data->ema_account);
             
