@@ -377,7 +377,7 @@ if ($err) {
                 )
             );
             
-            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+            $mail->SMTPDebug = 1;                                 // Enable verbose debug output
             $mail->isSMTP();                                      // Set mailer to use SMTP
             $mail->SMTPAuth = true;  
             $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
