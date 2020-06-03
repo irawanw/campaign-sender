@@ -12,7 +12,7 @@ ob_flush();
 set_time_limit(0);
 
 //quick variable
-$number_slot = 8;
+$number_slot = 3;
 $simultaneous = 1;
 
 exec("ps aux | grep php", $process);
