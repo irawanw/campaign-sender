@@ -63,7 +63,7 @@ if ($err) {
       $emails = explode("\n", $data->emc_email_target);
       $servers = explode("|", $data->emc_server_sending);		
       //$email_per_slot = ceil(count($emails)/$number_slot);
-      $email_per_slot = ceil(count($emails)/$slot);
+      $email_per_slot = ceil(count($emails)/count($slot));
       
       //remove empty array
       $slot = array_filter($slot);
