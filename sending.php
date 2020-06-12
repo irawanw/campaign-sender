@@ -576,33 +576,28 @@ function randomize_email_account()
     global $email_accounts;
     global $data;
     
-    $random = array_rand($email_accounts);
-    $email_account_data = explode("|", $email_accounts[$random]);
-    $data->ema_account = $email_account_data[0];
-    $data->ema_password = $email_account_data[1];
-    $data->ema_smtp_addr = $email_account_data[2];
-    $data->ema_smtp_port = $email_account_data[3];
-    $data->ema_imap_addr = $email_account_data[4];
-    $data->ema_imap_port = $email_account_data[5];
-    $data->ema_pop3_addr = $email_account_data[6];
-    $data->ema_pop3_port = $email_account_data[7];
-    
-    //echo $random;
-    //echo "<pre>";
-    //print_r($email_account_data);
-    //echo "</pre>";
-    
-    if( $data->ema_account == '' ||
-        $data->ema_password == '' ||
-        $data->ema_smtp_addr == '' ||
-        $data->ema_smtp_port == '' ||
-        $data->ema_imap_addr == '' ||
-        $data->ema_pop3_port == '')
-    {
-        unset($master_email_accounts[$random]);
-        unset($email_accounts[$random]);
-        randomize_email_account();
-    }
+    //$random = array_rand($email_accounts);
+    //$email_account_data = explode("|", $email_accounts[$random]);
+    //$data->ema_account = $email_account_data[0];
+    //$data->ema_password = $email_account_data[1];
+    //$data->ema_smtp_addr = $email_account_data[2];
+    //$data->ema_smtp_port = $email_account_data[3];
+    //$data->ema_imap_addr = $email_account_data[4];
+    //$data->ema_imap_port = $email_account_data[5];
+    //$data->ema_pop3_addr = $email_account_data[6];
+    //$data->ema_pop3_port = $email_account_data[7];
+    //
+    //if( $data->ema_account == '' ||
+    //    $data->ema_password == '' ||
+    //    $data->ema_smtp_addr == '' ||
+    //    $data->ema_smtp_port == '' ||
+    //    $data->ema_imap_addr == '' ||
+    //    $data->ema_pop3_port == '')
+    //{
+    //    unset($master_email_accounts[$random]);
+    //    unset($email_accounts[$random]);
+    //    randomize_email_account();
+    //}
     
     $mail_check = new PHPMailer(true);
     $mail_check->CharSet = 'UTF-8';  
@@ -631,16 +626,17 @@ function randomize_email_account()
             echo $data->ema_account." login is valid\n";
         
         $mail_check->SmtpClose();
-        unset($email_accounts[$random]);
+        
+        //unset($email_accounts[$random]);
     }
     catch(Exception $error) 
     { 
         echo $data->ema_account." could not login probably domain is blacklisted?\n";
         $mail_check->SmtpClose();
         
-        unset($master_email_accounts[$random]);
-        unset($email_accounts[$random]);
-        randomize_email_account();
+        //unset($master_email_accounts[$random]);
+        //unset($email_accounts[$random]);
+        //randomize_email_account();
     }
 }
 ?>
