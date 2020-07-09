@@ -33,10 +33,6 @@ curl_setopt_array($curl, array(
 $response = curl_exec($curl);
 $err = curl_error($curl);
 
-//echo "<pre>";
-//print_r($response);
-//echo "</pre>";
-
 curl_close($curl);
 
 if ($err) {
@@ -58,6 +54,9 @@ if ($err) {
       $emails = explode("\n", $data->emc_email_target);
       $servers = explode("|", $data->emc_server_sending);		
       $email_per_slot = ceil(count($emails)/count($slot));
+      
+      echo "Emailing starting #".$data->emc_id."\n";
+      echo "Send out to ".count($emails)." recipients\n";
       
       //remove empty array
       $slot = array_filter($slot);
@@ -91,11 +90,11 @@ if ($err) {
       $emails = $list_emails;
       
       //print_r($data);
-      echo "per slot email : ".($email_per_slot)."<br>\n";
-      echo "count server still on sending : ".($current_slot)."<br>\n";
-      echo "count email account will use : ".count($slot)."<br>\n";
-      echo "start line : ".$start_line."<br>\n";
-      echo "stop line : ".$stop_line."<br>\n";
+      //echo "per slot email : ".($email_per_slot)."<br>\n";
+      //echo "count server still on sending : ".($current_slot)."<br>\n";
+      //echo "count email account will use : ".count($slot)."<br>\n";
+      //echo "start line : ".$start_line."<br>\n";
+      //echo "stop line : ".$stop_line."<br>\n";
       
       //get email account details
       $email_account_data = explode("|", $slot[$current_slot]);
@@ -158,7 +157,7 @@ if ($err) {
       //print_r($data);
       //echo "</pre>";
 		
-      echo "checking ema_account<br>\n";
+      //echo "checking ema_account<br>\n";
       if($data->ema_account == '' || $data->ema_password == '')
       {					
         
@@ -185,7 +184,7 @@ if ($err) {
         $err = curl_error($curl);
         curl_close($curl);			
         
-        echo "Error when using email account and password.. (empty)<br>\n";
+        echo "Error when using email account and password.. (empty)\n";
         //die();
         
       }
@@ -235,7 +234,7 @@ if ($err) {
         $mail = new PHPMailer(true);
         $mail->CharSet = 'UTF-8';  
 
-        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+        $mail->SMTPDebug = 0;                                 // Enable verbose debug output
         $mail->isSMTP();                                      // Set mailer to use SMTP
         $mail->Host = $data->ema_smtp_addr;  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
@@ -276,17 +275,17 @@ if ($err) {
         $rotate_email_body = '';
         $concurrent_fail = 0;
         
-        echo "loop sending to all recipient<br>\n";
-        echo "<pre>";
-        print_r($email);
-        echo "</pre>";
+        echo "start sending to all recipient\n";
+        //echo "<pre>";
+        //print_r($email);
+        //echo "</pre>";
         
         foreach($emails as $index=>$email) 
         {
           
           if($email == '') 
           {
-            echo "empty recipient..next loop<br>\n";
+            echo "empty recipient..next loop\n";
             continue;
           }
         
@@ -310,6 +309,21 @@ if ($err) {
             $email_subject = $rotate_email_subject[$rotate_number_email_subject];
             $sender_name = $rotate_sender_name[$rotate_number_sender_name];
             //echo $rotate_email_body."<hr><br><br>";
+            
+            
+            $global_monitoring['gmo_server_ip'] = SERVER_IP;
+            $global_monitoring['gmo_domain'] = $data->ema_account;
+            $global_monitoring['gmo_sender_name'] = $rotate_sender_name[$rotate_number_sender_name];
+            $global_monitoring['gmo_subject'] = $rotate_email_subject[$rotate_number_email_subject];
+            $global_monitoring['gmo_email'] = $rotate_email[$rotate_number_email];
+            $global_monitoring['gmo_telephone1'] = $rotate_telephone[$rotate_number_telephone];
+            $global_monitoring['gmo_telephone2'] = $rotate_telephone_2[$rotate_number_telephone_2];
+            $global_monitoring['gmo_portable'] = $rotate_fixed_telephone[$rotate_number_fixed_telephone];
+            $global_monitoring['gmo_url'] = $rotate_site_internet[$rotate_number_site_internet];
+            $global_monitoring['gmo_unsub_link'] = $rotate_unsubscribe_text[$rotate_number_unsubscribe_text];
+            $global_monitoring['gmo_dont_reply'] = $rotate_dont_reply[$rotate_number_dont_reply];
+            $global_monitoring['gmo_number_changed'] = $rotate_number_change[$rotate_number_number_change];
+            
             
             $rotate_number_telephone++;
             $rotate_number_telephone_2++;
@@ -339,7 +353,8 @@ if ($err) {
           }
           $sending++;
             
-          try {        
+          try 
+          {        
             $mail->setFrom($data->ema_account, $sender_name);	
             $mail->ClearAllRecipients();
             $mail->addAddress($email);       // Name is optional
@@ -348,6 +363,10 @@ if ($err) {
             //Content
             $mail->isHTML(true);
             $mail->Subject = $email_subject;
+            
+            //echo $sender_name."\n";
+            //echo $email_subject;
+            //die();
             
             //no rotation message
             if($rotate_email_body == ''){
@@ -371,9 +390,9 @@ if ($err) {
             //echo $rotate_email_body."<br>";
             //die();
             
-            echo 'Sending to '.$email."<br>\n";
+            echo 'send to '.$email."\n";
             $mail->send();
-            echo 'Message has been sent to '.$email."<br>\n";
+            echo 'success sent to '.$email."\n";
             $total_success_sent += 1;      
 
             //count processing and sent
@@ -395,12 +414,106 @@ if ($err) {
             $err = curl_error($curl);
             curl_close($curl);
             
+            //update global monitoring list
+            //update global monitoring list
+            //update global monitoring list
+            $global_monitoring['gmo_deliverance'] = 'delivered';
+            $global_monitoring['gmo_hash_key'] =  md5(  $global_monitoring['gmo_server_ip'] .
+                                                    $global_monitoring['gmo_domain'] .
+                                                    $global_monitoring['gmo_sender_name'] .
+                                                    $global_monitoring['gmo_subject'] .
+                                                    $global_monitoring['gmo_email'] .
+                                                    $global_monitoring['gmo_telephone1'] .
+                                                    $global_monitoring['gmo_telephone2'] .
+                                                    $global_monitoring['gmo_portable'] .
+                                                    $global_monitoring['gmo_url'] . 
+                                                    $global_monitoring['gmo_unsub_link'] .
+                                                    $global_monitoring['gmo_dont_reply'] .
+                                                    $global_monitoring['gmo_number_changed'] .
+                                                    $global_monitoring['gmo_hash_key']);
+            
+            //echo "<pre>";
+            //print_r($global_monitoring);
+            //echo "</pre>";
+            
+            $fields_string = http_build_query($global_monitoring);
+            $curl = curl_init();
+            
+            curl_setopt_array($curl, array(  
+              CURLOPT_URL => API_URL."global_monitoring/",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 10,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "POST",
+              CURLOPT_POSTFIELDS => $fields_string,
+              CURLOPT_HTTPHEADER => array(	    
+              "content-type: application/x-www-form-urlencoded",
+              "x-api-key: ".API_KEY
+              ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);  
+            //end update global monitoring list
+            //end update global monitoring list
+            //end update global monitoring list            
+            
             $concurrent_fail = 0;
             
-          } catch (Exception $e) {
+          } 
+          catch (Exception $e) 
+          {
             $concurrent_fail++;
             
             echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+            
+            
+            //update global monitoring list
+            //update global monitoring list
+            //update global monitoring list
+            $global_monitoring['gmo_deliverance'] = $mail->ErrorInfo;
+            $global_monitoring['hash_key'] =  md5(  $global_monitoring['gmo_server_ip'] .
+                                                    $global_monitoring['gmo_domain'] .
+                                                    $global_monitoring['gmo_sender_name'] .
+                                                    $global_monitoring['gmo_subject'] .
+                                                    $global_monitoring['gmo_email'] .
+                                                    $global_monitoring['gmo_telephone1'] .
+                                                    $global_monitoring['gmo_telephone2'] .
+                                                    $global_monitoring['gmo_portable'] .
+                                                    $global_monitoring['gmo_url'] . 
+                                                    $global_monitoring['gmo_unsub_link'] .
+                                                    $global_monitoring['gmo_dont_reply'] .
+                                                    $global_monitoring['gmo_number_changed'] .
+                                                    $global_monitoring['gmo_hash_key']);
+                                                    
+            $fields_string = http_build_query($global_monitoring);
+            $curl = curl_init();
+            
+            curl_setopt_array($curl, array(  
+              CURLOPT_URL => API_URL."global_monitoring",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 10,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "POST",
+              CURLOPT_POSTFIELDS => $fields_string,
+              CURLOPT_HTTPHEADER => array(	    
+              "content-type: application/x-www-form-urlencoded",
+              "x-api-key: ".API_KEY
+              ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);  
+            //end update global monitoring list
+            //end update global monitoring list
+            //end update global monitoring list
+            
             
             $fields = array(
               'emc_failed_sending' => $email.'|'.date("Y-m-d H:i:s").'|'.$data->ema_account.' : '.$mail->ErrorInfo."\n"
@@ -476,7 +589,7 @@ if ($err) {
           
         }
 
-        echo "end of loop sending mail<br>\n";
+        echo "end of loop sending mail\n";
         
         //set status to completed
         if($total_sent == count($emails)) {
